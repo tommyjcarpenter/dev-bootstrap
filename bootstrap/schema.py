@@ -6,13 +6,12 @@ schema = {
     "properties": {
         "comments": {"type": "array", "items": {"type": "string"}},
         "initial_mkdirs": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
-        # TODO" transition this to {src: dst}
         "links": {
             "type": "object",
             "properties": {
-                "all": {"type": "object"},
-                "work": {"type": "object"},
-                "private": {"type": "object"},
+                "all": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "work": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "private": {"type": "array", "items": {"$ref": "#/definitions/link"}},
             },
         },
         "commands": {
@@ -44,7 +43,15 @@ schema = {
                     "default": False,
                 },
             },
-        }
+        },
+        "link": {
+            "type": "object",
+            "required": ["src", "dst"],
+            "properties": {
+                "src": {"type": "string"},
+                "dst": {"type": "string"},
+            },
+        },
     },
     "additionalProperties": False,
 }
