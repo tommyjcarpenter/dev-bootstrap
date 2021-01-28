@@ -57,18 +57,17 @@ The goal here is to bootstrap my Arch based dev env completely in a Docker conta
 
 I came across this article after I started this, but this person really has a similar idea: https://www.codeproject.com/Articles/1247038/Using-Docker-to-maintain-a-development-environment
 
-## Arch
+## Arch Notes:
+TODO: this Dockerfile is not currently user agnostic. It should take a param for the username during the build. The hardcoding of `tommy` below should be fixed.
 
-TOMMY WARNING: Sometime in 2020, Docker for Mac changed to buildkit.
+TODO 2: Sometime in 2020, Docker for Mac changed to buildkit.
 The below does not work unless I run the build like this:
 
     DOCKER_BUILDKIT=0 ...
 
-These seem relevent:
-1. https://unix.stackexchange.com/questions/631177/arch-linux-in-docker-on-a-free-system-is-running-out-of-space/631178#631178
-2. https://github.com/moby/buildkit/issues/1267
-3. https://stackoverflow.com/questions/63652551/docker-build-vs-docker-run-dont-behave-the-same
+Issue explained here: https://github.com/moby/buildkit/issues/1267
 
+## Build
 It is not possible to do a `COPY` in Docker from an arbitrary host path.
 The files get transfered to a docker build context from the local directory.
 So, we first need our dotfiles here, then we remove them later.
