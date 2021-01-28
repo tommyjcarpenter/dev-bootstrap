@@ -2,10 +2,11 @@
 import os
 import json
 import click
+from bootstrap.schema import config_validate
 from bootstrap.boot import boot
 
 
-PREREQ = "Are all prequisites met? Fish is installed, is default shell, and a system python3 (NOT PYENV) is installed? If this is arch, is yay installed? Enter [t] if true or [f] for  false"
+PREREQ = "Are all prequisites met? See README"
 
 
 @click.command()
@@ -26,6 +27,10 @@ def main(prereqs, name, redovim, systype, loctype):
     with open("config.json", "r") as f:
         cfg = json.loads(f.read())
 
+    # validate schema
+    config_validate(cfg)
+
+    # go!
     boot(cfg, name, redovim, systype, loctype)
 
 

@@ -9,13 +9,15 @@ from bootstrap.utils import (
 
 
 def boot(cfg: dict, name, redovim, systype, loctype):
-    # CURRENT ORDER (TODO, make this specifiable??)
-    # 1. mkdirs
-    # 2. generic softlinks
-    # 3. location softlinks (ie work gitconfig etc)
-    # 4. system specific commands
-    # 5. generic commands
-    # 6. packages (some system specific, some generic)
+    """
+    CURRENT ORDER (TODO, make this specifiable??)
+    1. mkdirs
+    2. generic softlinks
+    3. location softlinks (ie work gitconfig etc)
+    4. system specific commands
+    5. generic commands
+    6. packages (some system specific, some generic)
+    """
     mkdirs(cfg)
     softlinks(cfg, "all")
     softlinks(cfg, loctype)

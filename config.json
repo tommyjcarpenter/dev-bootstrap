@@ -5,13 +5,23 @@
         "TODO: put back gvim in pacman somehow, docker needs it for clipboard, but something is installing vim minimal",
         "gcc seems to be needed for grc, but homebrew does not auto resolve this?"
     ],
-    "initial_mkdirs": {
-        "~/.ssh": false,
-        "~/.vim/colors": false,
-        "~/.vim/autoload": false,
-        "~/.config/fish/conf.d/": false,
-        "~/.config/yamllint": false
-    },
+    "initial_mkdirs": [
+        {
+            "dir": "~/.ssh"
+        },
+        {
+            "dir": "~/.vim/colors"
+        },
+        {
+            "dir": "~/.vim/autoload"
+        },
+        {
+            "dir": "~/.config/fish/conf.d/"
+        },
+        {
+            "dir": "~/.config/yamllint"
+        }
+    ],
     "links": {
         "all": {
             "~/dotfiles/.vimrc": "~/.vimrc",

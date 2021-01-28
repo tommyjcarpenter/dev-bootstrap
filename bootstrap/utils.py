@@ -92,8 +92,8 @@ def _pipinstall(package, sudo=False, python3=True, user=True):
 
 def mkdirs(config):
     """recurisvely make needed dirs"""
-    for k, v in config["initial_mkdirs"].items():
-        _mkdirrec(k, delete_first=v)
+    for d in config["initial_mkdirs"]:
+        _mkdirrec(d["dir"], delete_first=d["delfirst"] if "delfirst" in d else False)
 
 
 def softlinks(config, section):
