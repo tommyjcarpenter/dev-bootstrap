@@ -8,20 +8,20 @@ RUN pacman -Sy archlinux-keyring --noconfirm
 RUN pacman -Syyu sudo fish --noconfirm
 
 ENV USER tommy
-ENV USERHOME /home/$USER
+ENV HOME /home/$USER
 ENV SHELL /usr/bin/fish
 
-RUN useradd --shell=$SHELL $USER -d $USERHOME
+RUN useradd --shell=$SHELL $USER -d $HOME
 RUN usermod -L $USER
 RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-RUN mkdir $USERHOME; chown -R $USER:$USER $USERHOME
+RUN mkdir $HOME; chown -R $USER:$USER $HOME
 # The below is questionable. If doing any development that does "make install" puts headers in /usr/local/include, it will fail without this
 RUN chown -R $USER:$USER  /usr/local
 
 # switch users
 USER $USER
-WORKDIR $USERHOME
+WORKDIR $HOME
 
 # Install prequisites
 # base-devel needed for yay: https://github.com/Jguer/yay#installation
@@ -52,11 +52,11 @@ RUN sudo pacman -Syyu \
 # http://allanmcrae.com/2015/01/replacing-makepkg-asroot/
 # https://bbs.archlinux.org/viewtopic.php?id=229027
 RUN git clone https://aur.archlinux.org/yay.git
-WORKDIR $USERHOME/yay
+WORKDIR $HOME/yay
 RUN makepkg -si --noconfirm
 RUN rm -rf yay
 
-WORKDIR $USERHOME
+WORKDIR $HOME
 
 # Install bootstrap
 COPY dotfiles/ dotfiles/
@@ -74,7 +74,7 @@ RUN sudo pip3 install py/
 RUN runboot.py --prereqs t --name tommy --redovim y --systype arch --loctype work
 
 # Cleanup
-RUN sudo pip3 uninstall py
+RUN sudo pip3 uninstall -y bootstrap
 RUN sudo rm -rf py/
 RUN rm config.json
 # (clear pac cache)
@@ -90,5 +90,5 @@ ENV TERM xterm-256color
 RUN sudo ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
 # Enter
-WORKDIR $USERHOME/workdir
+WORKDIR $HOME/workdir
 CMD tmux
