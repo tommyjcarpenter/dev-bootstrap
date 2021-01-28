@@ -23,30 +23,84 @@
         }
     ],
     "links": {
-        "all": {
-            "~/dotfiles/.vimrc": "~/.vimrc",
-            "~/dotfiles/tommy-mode-atom-dark-256.vim": "~/.vim/colors/tommy-mode-atom-dark-256.vim",
-            "~/dotfiles/.config/fish/config.fish": "~/.config/fish/config.fish",
-            "~/dotfiles/.flake8": "~/.flake8",
-            "~/dotfiles/.jshintrc": "~/.jshintrc",
-            "~/dotfiles/.pylintrc": "~/.pylintrc",
-            "~/dotfiles/.tmux.conf": "~/.tmux.conf",
-            "~/dotfiles/.config/yamllint/config": "~/.config/yamllint/config",
-            "~/dotfiles/.gitconfig": "~/.gitconfig"
-        },
-        "work": {
-            "~/dotfiles/.bashrc-work": "~/.bashrc",
-            "~/dotfiles/.pypirc-work": "~/.pypirc",
-            "~/dotfiles/ssh-config-work": "~/.ssh/config",
-            "~/dotfiles/.config/fish/conf.d/work.fish": "~/.config/fish/conf.d/work.fish"
-        },
-        "private": {
-            "~/dotfiles/.conkyrc-private": "~/.conkyrc",
-            "~/dotfiles/.rsyncexclude.txt-private": "~/.rsyncexclude.txt",
-            "~/dotfiles/.config/fish/conf.d/homearch.fish": "~/.config/fish/conf.d/homearch.fish",
-            "~/dotfiles/.pypirc-private": "~/.pypirc",
-            "~/dotfiles/.hgrc-private": "~/.hgrc"
-        }
+        "all": [
+            {
+                "src": "~/dotfiles/.vimrc",
+                "dst": "~/.vimrc"
+            },
+            {
+                "src": "~/dotfiles/tommy-mode-atom-dark-256.vim",
+                "dst": "~/.vim/colors/tommy-mode-atom-dark-256.vim"
+            },
+            {
+                "src": "~/dotfiles/.config/fish/config.fish",
+                "dst": "~/.config/fish/config.fish"
+            },
+            {
+                "src": "~/dotfiles/.flake8",
+                "dst": "~/.flake8"
+            },
+            {
+                "src": "~/dotfiles/.jshintrc",
+                "dst": "~/.jshintrc"
+            },
+            {
+                "src": "~/dotfiles/.pylintrc",
+                "dst": "~/.pylintrc"
+            },
+            {
+                "src": "~/dotfiles/.tmux.conf",
+                "dst": "~/.tmux.conf"
+            },
+            {
+                "src": "~/dotfiles/.config/yamllint/config",
+                "dst": "~/.config/yamllint/config"
+            },
+            {
+                "src": "~/dotfiles/.gitconfig",
+                "dst": "~/.gitconfig"
+            }
+        ],
+        "work": [
+            {
+                "src": "~/dotfiles/.bashrc-work",
+                "dst": "~/.bashrc"
+            },
+            {
+                "src": "~/dotfiles/.pypirc-work",
+                "dst": "~/.pypirc"
+            },
+            {
+                "src": "~/dotfiles/ssh-config-work",
+                "dst": "~/.ssh/config"
+            },
+            {
+                "src": "~/dotfiles/.config/fish/conf.d/work.fish",
+                "dst": "~/.config/fish/conf.d/work.fish"
+            }
+        ],
+        "private": [
+            {
+                "src": "~/dotfiles/.conkyrc-private",
+                "dst": "~/.conkyrc"
+            },
+            {
+                "src": "~/dotfiles/.rsyncexclude.txt-private",
+                "dst": "~/.rsyncexclude.txt"
+            },
+            {
+                "src": "~/dotfiles/.config/fish/conf.d/homearch.fish",
+                "dst": "~/.config/fish/conf.d/homearch.fish"
+            },
+            {
+                "src": "~/dotfiles/.pypirc-private",
+                "dst": "~/.pypirc"
+            },
+            {
+                "src": "~/dotfiles/.hgrc-private",
+                "dst": "~/.hgrc"
+            }
+        ]
     },
     "commands": {
         "all": [

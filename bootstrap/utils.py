@@ -97,8 +97,8 @@ def mkdirs(config):
 
 
 def softlinks(config, section):
-    for k, v in config["links"][section].items():
-        _softlink(k, v)
+    for link in config["links"][section]:
+        _softlink(link["src"], link["dst"])
 
 
 def cmds(config, systype):
