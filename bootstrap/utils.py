@@ -7,8 +7,6 @@ import os
 import shutil
 import sys
 
-# NOTE: Cant add the installation of fish itself into this script without breaking it up, because the commands in here are executed using fish itself. So, just install that ahead of time.
-
 BOOTSTRAPHOMEDIR = None
 BOOTSTRAPFISHPATH = None
 

@@ -1,9 +1,12 @@
 # Summary
 This "package" allows you to specify a complete dev env setup, including packages to install (homebrew, yay, pacman, npm, etc etc).
 You write a `config.json`, then run a python CLI tool.
+I use this to keep multiple machines (work mac, home Arch, Docker based arch dev boxes) all up to date with my dev environment.
 
 # Isn't there stuff already like this?
 There are probably many. However, the well known ones; Puppet, Chef, Ansible, etc, are very heavyweight for my needs.
+
+There are a lot of "dotfiles" repos on github; this depends on that --- it requires you to have a `~/dotfiles/` repo that can be symlinked against, but it goes a lot further (than dotfiles).
 
 This was only a few hundred lines of python, and I've been using this to setup new computers (eg new Macs, new PC builds) and Dockerized development environments for years.
 
@@ -21,6 +24,12 @@ I am planning on making this more extensible so the user can provide functions t
 # Config.json
 
 TODO: (write this section)
+
+# Major TODOs:
+
+1. Ubuntu support
+2. Generic shell support
+3. I'm sure there's more
 
 # Install and Running
 
@@ -46,8 +55,7 @@ The goal here is to bootstrap my Arch based dev env completely in a Docker conta
 
 I came across this article after I started this, but this person really has a similar idea: https://www.codeproject.com/Articles/1247038/Using-Docker-to-maintain-a-development-environment
 
-# Arch
-## Building
+## Arch
 
 TOMMY WARNING: Sometime in 2020, Docker for Mac changed to buildkit.
 The below does not work unless I run the build like this:
