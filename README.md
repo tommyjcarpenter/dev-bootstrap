@@ -30,7 +30,7 @@ TODO: (write this section)
 # Major TODOs:
 
 1. Ubuntu support
-2. Have a JSON schema validator for `config.json`
+2. [IN PROGRESS] Have a JSON schema validator for `config.json`
 3. User supplied functions, and `vim()` should move to this
 
 # Install and Running

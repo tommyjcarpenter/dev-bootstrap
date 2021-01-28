@@ -9,6 +9,6 @@ setup(
     description=("Dev env bootstrapping"),
     license="MIT",
     url="https://github.com/tommyjcarpenter/dev-bootstrap",
-    install_requires=["click"],
+    install_requires=["click", "jsonschema"],
     scripts=["bin/runboot.py"],
 )
