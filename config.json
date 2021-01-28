@@ -66,6 +66,9 @@
                 "yamllint",
                 "diff-so-fancy",
                 "fzf"
+            ],
+            "pip": [
+                "powerline-status"
             ]
         },
         "arch": {

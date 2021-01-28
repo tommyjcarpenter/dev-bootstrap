@@ -17,9 +17,11 @@ I am planning on making this more extensible so the user can provide functions t
 1. python3 (I am using 3.9)
 2. if on mac, `homebrew`, and if on Arch, `yay`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
-3. fish shell. TODO: make this configurable! This project is not geared towards `bash` at the moment.
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
 5. Write `config.json`; see the next section
+
+Optional:
+- if you want `vim` installed, your `.vimrc` should be using vim-plug.
 
 # Config.json
 
@@ -28,8 +30,8 @@ TODO: (write this section)
 # Major TODOs:
 
 1. Ubuntu support
-2. Generic shell support
-3. I'm sure there's more
+2. Have a JSON schema validator for `config.json`
+3. User supplied functions, and `vim()` should move to this
 
 # Install and Running
 

@@ -7,19 +7,17 @@ import os
 import shutil
 import sys
 
-BOOTSTRAPHOMEDIR = None
-BOOTSTRAPFISHPATH = None
+HOMEDIR = os.environ.get("HOME")
+SHELLPATH = os.environ.get("SHELL")
 
 
 def _replace_home(path):
     """fix home with full path"""
-    return path.replace("~", BOOTSTRAPHOMEDIR)
+    return path.replace("~", HOMEDIR)
 
 
 def _run_cmd(args, cwd=None, shortcircuit=True):
     """run a command"""
-    fish_path = BOOTSTRAPFISHPATH
-
     # I was having issues where this wasn't resolving home properly
     args = [_replace_home(x) for x in args] if isinstance(args, list) else _replace_home(args)
 
@@ -39,7 +37,7 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
         stderr=subprocess.PIPE,
         cwd=cwd,  # None is fine to pass: https://docs.python.org/3/library/subprocess.html
         shell=True,
-        executable=fish_path,
+        executable=SHELLPATH,
     )
 
     out, err = proc.communicate()
@@ -81,10 +79,7 @@ def _gitclone(repo, dest):
     assert os.path.isdir(dest)
 
 
-# These should be made Private:
-
-
-def pipinstall(package, sudo=False, python3=False, user=False):
+def _pipinstall(package, sudo=False, python3=True, user=True):
     """use pip to install a package"""
     sudoclause = "sudo " if sudo else ""
     pipclause = "pip " if python3 is False else "pip3 "
@@ -121,15 +116,22 @@ def packages(config, systype):
         if ptype == "brew":
             # sometimes brew will return a status of 1 in cases where it's "fine"
             _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
-        if ptype == "yay":
+        elif ptype == "yay":
             _run_cmd("yay -S {0} --noconfirm".format(" ".join(inner["yay"])))
-        if ptype == "pacman":
+        elif ptype == "pacman":
             _run_cmd("sudo pacman -S {0} --noconfirm".format(" ".join(inner["pacman"])))
-        # note that some of these are system agnostic and are repeated. Maybe we can have an "all" section in config?
-        if ptype == "fisher":
+
+        # note, these could be in "all" or package specific
+        elif ptype == "fisher":
             _run_cmd("fisher install " + " ".join(inner["fisher"]))
-        if ptype == "npm":
+        elif ptype == "npm":
             _run_cmd("'npm install {0} -g".format(" ".join(inner["npm"])))
+        elif ptype == "pip":
+            for pkg in inner["pip"]:
+                _pipinstall(pkg)
+        else:
+            # TODO: have a json schema validate
+            raise ValueError("Unsupported package type!")
 
 
 def vim():
