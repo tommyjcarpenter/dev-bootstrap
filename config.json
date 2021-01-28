@@ -1,0 +1,107 @@
+{
+    "comments": [
+        "this section is ignored and is here only to save my future self",
+        "cmake is for YCM",
+        "TODO: put back gvim in pacman somehow, docker needs it for clipboard, but something is installing vim minimal",
+        "gcc seems to be needed for grc, but homebrew does not auto resolve this?"
+    ],
+    "initial_mkdirs": {
+        "~/.ssh": false,
+        "~/.vim/colors": false,
+        "~/.vim/autoload": false,
+        "~/.config/fish/conf.d/": false,
+        "~/.config/yamllint": false
+    },
+    "links": {
+        "all": {
+            "~/dotfiles/.vimrc": "~/.vimrc",
+            "~/dotfiles/tommy-mode-atom-dark-256.vim": "~/.vim/colors/tommy-mode-atom-dark-256.vim",
+            "~/dotfiles/.config/fish/config.fish": "~/.config/fish/config.fish",
+            "~/dotfiles/.flake8": "~/.flake8",
+            "~/dotfiles/.jshintrc": "~/.jshintrc",
+            "~/dotfiles/.pylintrc": "~/.pylintrc",
+            "~/dotfiles/.tmux.conf": "~/.tmux.conf",
+            "~/dotfiles/.config/yamllint/config": "~/.config/yamllint/config",
+            "~/dotfiles/.gitconfig": "~/.gitconfig"
+        },
+        "work": {
+            "~/dotfiles/.bashrc-work": "~/.bashrc",
+            "~/dotfiles/.pypirc-work": "~/.pypirc",
+            "~/dotfiles/ssh-config-work": "~/.ssh/config",
+            "~/dotfiles/.config/fish/conf.d/work.fish": "~/.config/fish/conf.d/work.fish"
+        },
+        "private": {
+            "~/dotfiles/.conkyrc-private": "~/.conkyrc",
+            "~/dotfiles/.rsyncexclude.txt-private": "~/.rsyncexclude.txt",
+            "~/dotfiles/.config/fish/conf.d/homearch.fish": "~/.config/fish/conf.d/homearch.fish",
+            "~/dotfiles/.pypirc-private": "~/.pypirc",
+            "~/dotfiles/.hgrc-private": "~/.hgrc"
+        }
+    },
+    "commands": {
+        "all": [
+            "curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher"
+        ],
+        "mac": [
+            "curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+        ]
+    },
+    "packages": {
+        "mac": {
+            "brew": [
+                "gcc",
+                "grc",
+                "jq",
+                "tmux",
+                "vim",
+                "go",
+                "exa",
+                "cmake",
+                "tig",
+                "flake8",
+                "black",
+                "pyenv",
+                "pyenv-virtualenv",
+                "npm",
+                "yamllint",
+                "diff-so-fancy",
+                "fzf"
+            ]
+        },
+        "arch": {
+            "pacman": [
+                "grc",
+                "cmake",
+                "npm",
+                "go",
+                "go-tools",
+                "exa",
+                "tig",
+                "glances",
+                "tmux",
+                "powerline",
+                "powerline-fonts",
+                "rxvt-unicode"
+            ],
+            "yay": [
+                "jq",
+                "vim-plug",
+                "diff-so-fancy",
+                "pyenv",
+                "pyenv-virtualenv",
+                "flake8",
+                "python-black",
+                "twine"
+            ]
+        },
+        "all": {
+            "fisher": [
+                "jethrokuan/z",
+                "oh-my-fish/theme-bobthefish"
+            ],
+            "npm": [
+                "jshint"
+            ]
+        }
+    }
+}
