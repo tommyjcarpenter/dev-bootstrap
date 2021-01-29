@@ -1,7 +1,6 @@
 """
 install everything
 """
-import json
 import subprocess
 import os
 import shutil
@@ -25,7 +24,10 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
         cwd = _replace_home(cwd)
 
     print(
-        "\nRunning: {0} from: {1}".format(" ".join(args) if isinstance(args, list) else args, cwd),
+        "\nRunning: {0} {1}".format(
+            " ".join(args) if isinstance(args, list) else args,
+            "from: {}".format(cwd) if cwd else "",
+        ),
         flush=True,
     )
 
@@ -97,18 +99,20 @@ def mkdirs(config):
 
 
 def softlinks(config, section):
+    """make all softlinks"""
     for link in config["links"][section]:
         _softlink(link["src"], link["dst"])
 
 
 def cmds(config, systype):
+    """run all commands"""
     if systype in config["commands"]:
-        cmds = config["commands"][systype]
-        for c in cmds:
+        for c in config["commands"][systype]:
             _run_cmd(c)
 
 
 def packages(config, systype):
+    """install all packages"""
     if systype not in config["packages"]:
         return
     inner = config["packages"][systype]
@@ -135,7 +139,10 @@ def packages(config, systype):
 
 
 def vim():
-    # TODO: this should be written as some kind of user-pluiginable-function
+    """
+    install my custom vim setup
+    TODO: this should be written as some kind of user-pluiginable-function
+    """
     _mkdirrec("~/.vim/plugged", delete_first=True)
 
     print("\nthe following vim command takes some time, be patient!\n")

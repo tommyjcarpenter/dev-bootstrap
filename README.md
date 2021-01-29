@@ -24,8 +24,19 @@ Optional:
 - if you want `vim` installed, your `.vimrc` should be using vim-plug.
 
 # Config.json
+The idea here is that you write `config.json` to completely describe what you would like linked, installed, ran, etc.
 
-TODO: (write this section)
+My personal `config.json` is included in this repo, for now, but I may eventually remove it from here.
+
+Please see the (evolving) jsonschema for `config.json` in `bootstrap/schema.py` for the full schema.
+But for an overview, these are the major sections:
+
+1. `comments`: this is just a list of strings for your own keeping since JSON has no native commenting mechanism. IE remind yourself why you install something etc.
+2. `initial_mkdirs`: directories to be recursively made. For example, `~/.ssh/..`. You can specify whether to try deleting the directory first, which is sometimes helpful for "rebootstrapping"
+3. `links`: this is a list of softlinked dotfiles, from you `~/dotfiles` directory, that can vary by "location" if you want. IE, if you have a `.gitconfig` that you use on "work" machines, and a seperate one you use on "private" machines, you can specify these seperately, and when you run the script, you specify the location. There is also a generic `all` key for specifying location-agnostic keys.
+4. `commands`: a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. While I havent tested this on mac yet, on linux, if the command needs sudo, it will pause and ask for your sudo password using a `STDIN` pipe, so privleged commands are fine.
+5. `packages`: a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm` and `pip`. Examples of `mac` include `brew`. You can also include "agnostic" installs in the os-specific sections, for example, "I only want this NPM package installed on my mac".
+
 
 # Major TODOs:
 
