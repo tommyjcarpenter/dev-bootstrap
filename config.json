@@ -158,7 +158,8 @@
                 "pyenv-virtualenv",
                 "flake8",
                 "python-black",
-                "twine"
+                "twine",
+                "qdirstat"
             ]
         },
         "all": {
