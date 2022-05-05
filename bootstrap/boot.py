@@ -1,11 +1,4 @@
-from bootstrap import utils
-from bootstrap.utils import (
-    cmds,
-    mkdirs,
-    softlinks,
-    vim,
-    packages,
-)
+from bootstrap.utils import cmds, mkdirs, packages, softlinks, vim
 
 
 def boot(cfg: dict, name, redovim, systype, loctype):
@@ -31,6 +24,10 @@ def boot(cfg: dict, name, redovim, systype, loctype):
         vim()
 
     # Install fzf bindings  TODO: is there a yes/yes/yes option so we can do this automatically?
-    print("\n\n******NOTE!!! Manually run the following which are not yet handled******")
-    print("/usr/local/opt/fzf/install")
+    print(
+        "\n\n******NOTE!!! Manually run the following which are not yet handled******"
+    )
     print("vim +GoInstallBinaries +qall")
+    print("open vim and do")
+    print("vim :CocInstall coc-pyright")
+    print("vim :CocInstall coc-yaml")
