@@ -157,7 +157,7 @@ def vim():
     # This is my attempt to run coc installs then exit
     # this definitely runs when run within vim, but questionable on the CMD line
     # https://github.com/neoclide/coc.nvim/issues/3802
-    _run_cmd("vim +'exec CocInstall()'")
+    _run_cmd("vim -c 'CocInstall -sync coc-json coc-html coc-pyright coc-yaml|qall'")
 
     # TODO: this does not always return, or complete in Docker, because it wants to install black
     # TODO: this tries to install black, which puts out a promt; have to fix that to renable this
