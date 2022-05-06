@@ -28,6 +28,3 @@ def boot(cfg: dict, name, redovim, systype, loctype):
         "\n\n******NOTE!!! Manually run the following which are not yet handled******"
     )
     print("vim +GoInstallBinaries +qall")
-    print("open vim and do")
-    print("vim :CocInstall coc-pyright")
-    print("vim :CocInstall coc-yaml")

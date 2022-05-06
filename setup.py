@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="bootstrap",
-    version="1.0.2",
+    version="1.0.3",
     packages=find_packages(),
     author="Tommy Carpenter",
     author_email="tommyjcarpenter@gmail.com",
