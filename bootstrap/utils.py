@@ -1,9 +1,9 @@
 """
 install everything
 """
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
 
 HOMEDIR = os.environ.get("HOME")
@@ -18,7 +18,11 @@ def _replace_home(path):
 def _run_cmd(args, cwd=None, shortcircuit=True):
     """run a command"""
     # I was having issues where this wasn't resolving home properly
-    args = [_replace_home(x) for x in args] if isinstance(args, list) else _replace_home(args)
+    args = (
+        [_replace_home(x) for x in args]
+        if isinstance(args, list)
+        else _replace_home(args)
+    )
 
     if cwd:
         cwd = _replace_home(cwd)
@@ -150,15 +154,10 @@ def vim():
     # have used:  vim +PlugInstall +qall +silent >/dev/null
     _run_cmd("vim +PlugInstall +qall")
 
-    # FORMERLY NOTE: on arch, hit this issue: https://github.com/Valloric/YouCompleteMe/issues/778
-    # had to do pacman -S clang; ./install.py --clang-completer --system-libclang
-    _run_cmd("git submodule update --init --recursive", cwd="~/.vim/plugged/YouCompleteMe")
-    # https://github.com/ycm-core/YouCompleteMe
-    # --all requires java
-    _run_cmd(
-        "./install.py --clangd-completer --go-completer --ts-completer",
-        cwd="~/.vim/plugged/YouCompleteMe",
-    )
+    # This is my attempt to run coc installs then exit
+    # this definitely runs when run within vim, but questionable on the CMD line
+    # https://github.com/neoclide/coc.nvim/issues/3802
+    _run_cmd("vim +'exec CocInstall()'")
 
     # TODO: this does not always return, or complete in Docker, because it wants to install black
     # TODO: this tries to install black, which puts out a promt; have to fix that to renable this
