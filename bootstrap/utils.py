@@ -117,10 +117,10 @@ def cmds(config, systype):
 
 def packages(config, systype):
     """install all packages"""
-    if systype not in config["packages"]:
-        return
     inner = config["packages"][systype]
+    print(f"Sections to process: {inner} for systpe {systype}")
     for ptype in inner:
+        print(f"Processing {ptype}")
         if ptype == "brew":
             # sometimes brew will return a status of 1 in cases where it's "fine"
             _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
@@ -139,7 +139,7 @@ def packages(config, systype):
                 _pipinstall(pkg)
         else:
             # TODO: have a json schema validate
-            raise ValueError("Unsupported package type!")
+            raise ValueError(f"Unsupported package type {ptype}!")
 
 
 def vim():

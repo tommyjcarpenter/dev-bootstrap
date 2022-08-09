@@ -17,6 +17,7 @@ def boot(cfg: dict, name, redovim, systype, loctype):
     cmds(cfg, systype)
     cmds(cfg, "all")  # should cmds just do this too at the end?
     packages(cfg, systype)
+    packages(cfg, "all")
 
     # this goes after os specific installs because that bootstraps various vim pluginery
     if redovim == "y":
