@@ -14,7 +14,7 @@ I am planning on making this more extensible so the user can provide functions t
 
 # Prerequisites
 
-1. python3 (I am using 3.10) and `poetry`
+1. python3 (I am using 3.10) and `poetry` and `pyenv` (`curl https://pyenv.run | bash`)
 2. if on mac, `homebrew`, and if on Arch, `yay`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
