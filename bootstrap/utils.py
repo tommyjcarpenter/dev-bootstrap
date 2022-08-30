@@ -18,11 +18,7 @@ def _replace_home(path):
 def _run_cmd(args, cwd=None, shortcircuit=True):
     """run a command"""
     # I was having issues where this wasn't resolving home properly
-    args = (
-        [_replace_home(x) for x in args]
-        if isinstance(args, list)
-        else _replace_home(args)
-    )
+    args = [_replace_home(x) for x in args] if isinstance(args, list) else _replace_home(args)
 
     if cwd:
         cwd = _replace_home(cwd)
@@ -121,25 +117,27 @@ def packages(config, systype):
     print(f"Sections to process: {inner} for systpe {systype}")
     for ptype in inner:
         print(f"Processing {ptype}")
-        if ptype == "brew":
-            # sometimes brew will return a status of 1 in cases where it's "fine"
-            _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
-        elif ptype == "yay":
-            _run_cmd("yay -S {0} --noconfirm".format(" ".join(inner["yay"])))
-        elif ptype == "pacman":
-            _run_cmd("sudo pacman -S {0} --noconfirm".format(" ".join(inner["pacman"])))
-
-        # note, these could be in "all" or package specific
-        elif ptype == "fisher":
-            _run_cmd("fisher install " + " ".join(inner["fisher"]))
-        elif ptype == "npm":
-            _run_cmd("'npm install {0} -g".format(" ".join(inner["npm"])))
-        elif ptype == "pip":
-            for pkg in inner["pip"]:
-                _pipinstall(pkg)
-        else:
-            # TODO: have a json schema validate
-            raise ValueError(f"Unsupported package type {ptype}!")
+        match ptype:
+            case "brew":
+                # sometimes brew will return a status of 1 in cases where it's "fine"
+                _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
+            case "yay":
+                _run_cmd("yay -S {0} --noconfirm".format(" ".join(inner["yay"])))
+            case "pacman":
+                _run_cmd("sudo pacman -S {0} --noconfirm".format(" ".join(inner["pacman"])))
+            case "apt":
+                _run_cmd("sudo apt-get install -y {0}".format(" ".join(inner["apt"])))
+            # note, these could be in "all" or package specific
+            case "fisher":
+                _run_cmd("fisher install " + " ".join(inner["fisher"]))
+            case "npm":
+                _run_cmd("'npm install {0} -g".format(" ".join(inner["npm"])))
+            case "pip":
+                for pkg in inner["pip"]:
+                    _pipinstall(pkg)
+            case _:
+                # TODO: have a json schema validate
+                raise ValueError(f"Unsupported package type {ptype}!")
 
 
 def vim():
@@ -157,9 +155,7 @@ def vim():
     # This is my attempt to run coc installs then exit
     # this definitely runs when run within vim, but questionable on the CMD line
     # https://github.com/neoclide/coc.nvim/issues/3802
-    _run_cmd(
-        "vim -c 'CocInstall -sync coc-json coc-html coc-pyright coc-yaml coc-git|qall'"
-    )
+    _run_cmd("vim -c 'CocInstall -sync coc-json coc-html coc-pyright coc-yaml coc-git|qall'")
 
     # TODO: this does not always return, or complete in Docker, because it wants to install black
     # TODO: this tries to install black, which puts out a promt; have to fix that to renable this

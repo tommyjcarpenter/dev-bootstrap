@@ -30,6 +30,7 @@ schema = {
                 "all": {"type": "array", "items": {"type": "string"}},
                 "mac": {"type": "array", "items": {"type": "string"}},
                 "arch": {"type": "array", "items": {"type": "string"}},
+                "ubuntu": {"type": "array", "items": {"type": "string"}},
             },
         },
         "packages": {
@@ -38,6 +39,7 @@ schema = {
             "properties": {
                 "mac": {"type": "object"},
                 "arch": {"type": "object"},
+                "ubuntu": {"type": "object"},
                 "all": {"type": "object"},
             },
         },
