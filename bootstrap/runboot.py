@@ -2,6 +2,7 @@ import json
 
 import click
 
+from bootstrap import utils
 from bootstrap.boot import boot
 from bootstrap.schema import config_validate
 
@@ -25,7 +26,7 @@ def main(prereqs, name, redovim, systype, loctype):
     assert systype in ["mac", "arch", "ubuntu"]
     assert loctype in ["work", "private"]
 
-    with open("~/dotfiles/bootstrap_config.json", "r") as f:
+    with open(utils._replace_home("~/dotfiles/bootstrap_config.json"), "r") as f:
         cfg = json.loads(f.read())
 
     # validate schema

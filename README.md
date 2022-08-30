@@ -14,7 +14,7 @@ I am planning on making this more extensible so the user can provide functions t
 
 # Prerequisites
 
-1. python3 (I am using 3.10)
+1. python3 (I am using 3.10) and `poetry`
 2. if on mac, `homebrew`, and if on Arch, `yay`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
@@ -51,5 +51,6 @@ You can also set CMD args on the command line:
 
     poetry run runboot --prereqs t --name tommycarpenter --redovim n --systype mac --loctype work
     poetry run runboot --prereqs t --name tommy --redovim n --systype arch --loctype private
+    /home/ubuntu/.local/bin/poetry run runboot --prereqs t --name ubuntu --redovim y --systype ubuntu --loctype work
 
 It is normally safe to run this repeatedly in an additive manner; as in, you can add packages to `config.json` and re-run.
