@@ -65,12 +65,10 @@ def _mkdirrec(dest, delete_first=False):
 
 def _softlink(src, dest, cwd=None):
     """remove dest, then softline src to dest"""
-    print("removing: {0}".format(dest))
-    _run_cmd("rm -f {0}".format(dest))
     src = _replace_home(src)
     dest = _replace_home(dest)
     print("linking {0} to {1}".format(src, dest))
-    _run_cmd("ln -s " + src + " " + dest, cwd)
+    _run_cmd("ln -f -s " + src + " " + dest, cwd)
     assert os.path.exists(dest)
 
 
