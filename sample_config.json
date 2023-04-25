@@ -1,0 +1,252 @@
+{
+    "commands": {
+        "all": [
+            "curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher",
+            "curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+        ],
+        "arch": [],
+        "mac": [
+            "xcode-select --install"
+        ],
+        "ubuntu": [
+            "sudo usermod -aG docker $USER",
+            "sudo apt-get install npm",
+            "sudo npm install -g n",
+            "sudo n stable",
+            "rm -rf ~/.pyenv/; curl https://pyenv.run | bash",
+            "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"awscliv2.zip\"; unzip awscliv2.zip; sudo ./aws/install",
+            "sudo snap install diff-so-fancy"
+        ]
+    },
+    "comments": [
+        "this section is ignored and is here only to save my future self"
+    ],
+    "initial_mkdirs": [
+        {
+            "dir": "~/.ssh"
+        },
+        {
+            "dir": "~/.vim/colors"
+        },
+        {
+            "dir": "~/.vim/autoload"
+        },
+        {
+            "dir": "~/.vim/spell"
+        },
+        {
+            "dir": "~/.config/fish/conf.d/"
+        },
+        {
+            "dir": "~/.aws"
+        },
+        {
+            "dir": "~/.config/yamllint"
+        },
+        {
+            "dir": "~/.config/mpv"
+        },
+        {
+            "dir": "~/.local/share/z"
+        },
+        {
+            "dir": "~/.local/share/fish"
+        }
+    ],
+    "links": {
+        "all": [
+            {
+                "dst": "~/.vimrc",
+                "src": "~/dotfiles/.vimrc"
+            },
+            {
+                "dst": "~/.vim/coc-settings.json",
+                "src": "~/dotfiles/coc-settings.json"
+            },
+            {
+                "dst": "~/.vim/colors/tommy-mode-atom-dark-256.vim",
+                "src": "~/dotfiles/tommy-mode-atom-dark-256.vim"
+            },
+            {
+                "dst": "~/.vim/colors/jellybeans.vim",
+                "src": "~/dotfiles/jellybeans.vim"
+            },
+            {
+                "dst": "~/.vim/spell/en.utf-8.add",
+                "src": "~/dotfiles/en.utf-8.add"
+            },
+            {
+                "dst": "~/.config/fish/config.fish",
+                "src": "~/dotfiles/.config/fish/config.fish"
+            },
+            {
+                "dst": "~/.flake8",
+                "src": "~/dotfiles/.flake8"
+            },
+            {
+                "dst": "~/.jshintrc",
+                "src": "~/dotfiles/.jshintrc"
+            },
+            {
+                "dst": "~/.tmux.conf",
+                "src": "~/dotfiles/.tmux.conf"
+            },
+            {
+                "dst": "~/.config/yamllint/config",
+                "src": "~/dotfiles/.config/yamllint/config"
+            },
+            {
+                "dst": "~/.gitconfig",
+                "src": "~/dotfiles/.gitconfig"
+            }
+        ],
+        "private": [
+            {
+                "dst": "~/.conkyrc",
+                "src": "~/dotfiles/.conkyrc-private"
+            },
+            {
+                "dst": "~/.config/mpv/mpv.conf",
+                "src": "~/dotfiles/mpv/mpv.conf"
+            },
+            {
+                "dst": "~/.config/vmware",
+                "src": "~/dotfiles/vmware"
+            },
+            {
+                "dst": "~/.rsyncexclude.txt",
+                "src": "~/dotfiles/.rsyncexclude.txt-private"
+            },
+            {
+                "dst": "~/.config/fish/conf.d/homearch.fish",
+                "src": "~/dotfiles/.config/fish/conf.d/homearch.fish"
+            },
+            {
+                "dst": "~/.pypirc",
+                "src": "~/dotfiles/.pypirc-private"
+            },
+            {
+                "dst": "~/.hgrc",
+                "src": "~/dotfiles/.hgrc-private"
+            }
+        ],
+        "work": [
+            {
+                "dst": "~/.bashrc",
+                "src": "~/dotfiles/.bashrc-work"
+            },
+            {
+                "dst": "~/.pypirc",
+                "src": "~/dotfiles/.pypirc-work"
+            },
+            {
+                "dst": "~/.ssh/config",
+                "src": "~/dotfiles/ssh-config-work"
+            },
+            {
+                "dst": "~/.config/fish/conf.d/work.fish",
+                "src": "~/dotfiles/.config/fish/conf.d/work.fish"
+            },
+            {
+                "dst": "~/.local/share/z/data",
+                "src": "~/dotfiles/work/z_history"
+            },
+            {
+                "dst": "~/.aws/config",
+                "src": "~/dotfiles/work/.aws/config"
+            },
+            {
+                "dst": "~/.aws/credentials",
+                "src": "~/dotfiles/work/.aws/credentials"
+            },
+            {
+                "dst": "~/.local/share/fish/fish_history",
+                "src": "~/dotfiles/work/fish_history"
+            },
+            {
+                "dst": "~/.merq_creds",
+                "src": "~/dotfiles/work/.merq_creds"
+            },
+            {
+                "dst": "~/.merq_firebase_creds",
+                "src": "~/dotfiles/work/.merq_firebase_creds"
+            }
+        ]
+    },
+    "packages": {
+        "all": {
+            "fisher": [
+                "jethrokuan/z",
+                "oh-my-fish/theme-bobthefish"
+            ],
+            "npm": [
+                "jshint"
+            ]
+        },
+        "arch": {
+            "pacman": [
+                "grc",
+                "nodejs",
+                "go",
+                "go-tools",
+                "exa",
+                "tig",
+                "glances",
+                "tmux",
+                "powerline",
+                "powerline-fonts",
+                "rxvt-unicode",
+                "noto-fonts-emoji"
+            ],
+            "yay": [
+                "jq",
+                "vim-plug",
+                "diff-so-fancy",
+                "pyenv",
+                "pyenv-virtualenv",
+                "flake8",
+                "python-black",
+                "twine",
+                "qdirstat"
+            ]
+        },
+        "mac": {
+            "brew": [
+                "gcc",
+                "grc",
+                "jq",
+                "tmux",
+                "vim",
+                "go",
+                "exa",
+                "tig",
+                "flake8",
+                "black",
+                "pyenv",
+                "pyenv-virtualenv",
+                "nodejs",
+                "yamllint",
+                "diff-so-fancy",
+                "fzf",
+                "jjuarez/homebrew-tap-1/kubecolor",
+                "gnu-sed",
+                "make"
+            ],
+            "pip": [
+                "powerline-status"
+            ]
+        },
+        "ubuntu": {
+            "apt": [
+                "unzip",
+                "grc",
+                "docker.io",
+                "docker.compose",
+                "exa",
+                "tox",
+                "postgresql",
+                "libpq-dev"
+            ]
+        }
+    }
+}

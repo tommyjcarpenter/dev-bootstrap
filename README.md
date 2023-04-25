@@ -13,8 +13,7 @@ This was only a few hundred lines of python, and I've been using this to setup n
 I am planning on making this more extensible so the user can provide functions that get run.
 
 # Prerequisites
-
-1. python3 (I am using 3.10) and `poetry` and `pyenv` (`curl https://pyenv.run | bash`)
+1. python3 (I am using 3.11) and `poetry` and `pyenv` (`curl https://pyenv.run | bash`)
 2. if on mac, `homebrew`, and if on Arch, `yay`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
@@ -24,23 +23,22 @@ Optional:
 - if you want `vim` installed, your `.vimrc` should be using vim-plug.
 
 # Config.json
-The idea here is that you write `config.json` to completely describe what you would like linked, installed, ran, etc.
+To use this package, you write a `config.json` to describe what you would like linked, installed, ran, etc.
+That is the only input, other than a few cmd line parameters.
 
-My personal `config.json` is in a private repo (~/dotfiles/bootstrap_config.json)
+A sample (actually a copy of my real one!) config is included; see `sample_config.json`
+
+My personal `config.json` is in my private `dotfiles` repo, and I clone it in step 4 above.
 
 Please see the (evolving) jsonschema for `config.json` in `bootstrap/schema.py` for the full schema.
-But for an overview, these are the major sections:
+These are the major sections:
 
-1. `comments`: this is just a list of strings for your own keeping since JSON has no native commenting mechanism. IE remind yourself why you install something etc.
-2. `initial_mkdirs`: directories to be recursively made. For example, `~/.ssh/..`. You can specify whether to try deleting the directory first, which is sometimes helpful for "rebootstrapping"
+1. `comments`: this is a list of strings for your own sanity, since JSON has no native commenting mechanism.
+2. `initial_mkdirs`: directories to be recursively made. For example, `~/.ssh/..`. You can specify whether to try deleting the directory first, which is helpful for "rebootstrapping"
 3. `links`: this is a list of softlinked dotfiles, from you `~/dotfiles` directory, that can vary by "location" if you want. IE, if you have a `.gitconfig` that you use on "work" machines, and a seperate one you use on "private" machines, you can specify these seperately, and when you run the script, you specify the location. There is also a generic `all` key for specifying location-agnostic keys.
 4. `commands`: a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. While I havent tested this on mac yet, on linux, if the command needs sudo, it will pause and ask for your sudo password using a `STDIN` pipe, so privleged commands are fine.
 5. `packages`: a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm` and `pip`. Examples of `mac` include `brew`. You can also include "agnostic" installs in the os-specific sections, for example, "I only want this NPM package installed on my mac".
 
-
-# Major TODOs:
-
-1. User supplied functions, and `vim()` should move to this
 
 # Install and Running
 
@@ -54,3 +52,7 @@ You can also set CMD args on the command line:
     /home/ubuntu/.local/bin/poetry run runboot --prereqs t --name ubuntu --redovim y --systype ubuntu --loctype work
 
 It is normally safe to run this repeatedly in an additive manner; as in, you can add packages to `config.json` and re-run.
+
+# Major TODOs:
+
+1. User supplied functions, and `vim()` should move to this
