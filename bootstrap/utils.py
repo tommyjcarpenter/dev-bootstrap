@@ -116,6 +116,9 @@ def packages(config, systype):
     for ptype in inner:
         print(f"Processing {ptype}")
         match ptype:
+            case "brew_tap":
+                for tap in inner["brew_tap"]:
+                    _run_cmd("brew tap " + tap, shortcircuit=False)
             case "brew":
                 # sometimes brew will return a status of 1 in cases where it's "fine"
                 _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)

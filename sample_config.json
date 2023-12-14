@@ -232,6 +232,9 @@
                 "gnu-sed",
                 "make"
             ],
+            "brew_tap": [
+                "blendle/blendle"
+            ],
             "pip": [
                 "powerline-status"
             ]
