@@ -1,3 +1,6 @@
+node_modules/*
+package-lock.json
+package.json
 bootstrap.egg-info/
 .coverage.Tommy*
 pip.conf

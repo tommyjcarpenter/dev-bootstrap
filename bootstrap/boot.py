@@ -23,7 +23,3 @@ def boot(cfg: dict, name, redovim, systype, loctype):
     if redovim == "y":
         # TODO: this should be some kind of user supplied function
         vim()
-
-    # Install fzf bindings  TODO: is there a yes/yes/yes option so we can do this automatically?
-    print("\n\n******NOTE!!! Manually run the following which are not yet handled******")
-    print("vim +GoInstallBinaries +qall")
