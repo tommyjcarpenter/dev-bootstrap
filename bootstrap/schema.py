@@ -10,17 +10,23 @@ schema = {
             "items": {"type": "string"},
         },
         "initial_mkdirs": {
-            "description": "directories to be recursively made. For example, `~/.ssh/..`. You can specify whether to try deleting the directory first, which is sometimes helpful for rebootstrapping",
-            "type": "array",
-            "items": {"$ref": "#/definitions/dir"},
+            "description": "directories to be recursively made, organized by OS type. Use 'all' for cross-platform dirs, and 'mac'/'arch'/'ubuntu' for OS-specific dirs.",
+            "type": "object",
+            "properties": {
+                "all": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
+                "mac": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
+                "arch": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
+                "ubuntu": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
+            },
         },
         "links": {
-            "description": "this is a list of softlinked dotfiles, from you `~/dotfiles` directory, that can vary by location if you want. IE, if you have a `.gitconfig` that you use on work machines, and a seperate one you use on private machines, you can specify these seperately, and when you run the script, you specify the location. There is also a generic `all` key for specifying location-agnostic keys.",
+            "description": "softlinked dotfiles from ~/dotfiles, organized by OS type. Use 'all' for cross-platform links, and 'mac'/'arch'/'ubuntu' for OS-specific links. For work/private specific links, put them in the respective bootstrap_config_work.json or bootstrap_config_private.json files under links.all.",
             "type": "object",
             "properties": {
                 "all": {"type": "array", "items": {"$ref": "#/definitions/link"}},
-                "work": {"type": "array", "items": {"$ref": "#/definitions/link"}},
-                "private": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "mac": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "arch": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "ubuntu": {"type": "array", "items": {"$ref": "#/definitions/link"}},
             },
         },
         "commands": {
@@ -34,13 +40,22 @@ schema = {
             },
         },
         "packages": {
-            "description": "a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm` and `pip`. Examples of `mac` include `brew`. You can also include 'agnostic' installs in the os-specific sections, for example, 'I only want this NPM package installed on my mac'.",
+            "description": "a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm`. Examples of `mac` include `brew`. You can also include 'agnostic' installs in the os-specific sections, for example, 'I only want this NPM package installed on my mac'.",
             "type": "object",
             "properties": {
                 "mac": {"type": "object"},
                 "arch": {"type": "object"},
                 "ubuntu": {"type": "object"},
                 "all": {"type": "object"},
+            },
+        },
+        "prereq_packages": {
+            "description": "packages that provide language toolchains (rust/cargo, go, poetry) needed before other packages can be installed. These are installed before `packages`.",
+            "type": "object",
+            "properties": {
+                "mac": {"type": "object"},
+                "arch": {"type": "object"},
+                "ubuntu": {"type": "object"},
             },
         },
     },
