@@ -13,7 +13,7 @@ This was only a few hundred lines of python, and I've been using this to setup n
 I am planning on making this more extensible so the user can provide functions that get run.
 
 # Prerequisites
-1. python3 (I am using 3.11) and `poetry` and `pyenv` (`curl https://pyenv.run | bash`)
+1. python3 (I am using 3.11) and `poetry`
 2. if on mac, `homebrew`, and if on Arch, `yay`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
