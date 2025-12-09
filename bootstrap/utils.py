@@ -1,6 +1,7 @@
 """
 install everything
 """
+
 import os
 import shutil
 import subprocess
@@ -8,6 +9,19 @@ import sys
 
 HOMEDIR = os.environ.get("HOME")
 SHELLPATH = os.environ.get("SHELL")
+
+# Package installation order by OS - some types must run before others
+# (e.g., ppa before apt to add repos, brew_tap before brew)
+# Cross-platform types (npm, pip, etc.) are appended after OS-specific ones
+CROSS_PLATFORM_PACKAGE_ORDER = ["npm", "go_install", "cargo", "fisher"]
+PACKAGE_ORDER = {
+    "mac": ["brew_tap", "brew", "brew_cask"] + CROSS_PLATFORM_PACKAGE_ORDER,
+    "arch": ["pacman", "yay"] + CROSS_PLATFORM_PACKAGE_ORDER,
+    "ubuntu": ["ppa", "apt", "snap"] + CROSS_PLATFORM_PACKAGE_ORDER,
+    "all": CROSS_PLATFORM_PACKAGE_ORDER,
+}
+# Derive all known package types from PACKAGE_ORDER (single source of truth)
+ALL_KNOWN_PACKAGE_TYPES = list(dict.fromkeys(pkg for order in PACKAGE_ORDER.values() for pkg in order))
 
 
 def _replace_home(path):
@@ -79,41 +93,49 @@ def _gitclone(repo, dest):
     assert os.path.isdir(dest)
 
 
-def _pipinstall(package, sudo=False, python3=True, user=True):
-    """use pip to install a package"""
-    sudoclause = "sudo " if sudo else ""
-    pipclause = "pip " if python3 is False else "pip3 "
-    userclause = " --user " if user else ""
-    _run_cmd(sudoclause + pipclause + "install " + userclause + package)
-
-
 # These take the config and execute a series of installs:
 
 
-def mkdirs(config):
-    """recurisvely make needed dirs"""
-    for d in config["initial_mkdirs"]:
+def mkdirs(config, section):
+    """recursively make needed dirs for a given section (all, mac, arch, ubuntu)"""
+    if "initial_mkdirs" not in config or section not in config["initial_mkdirs"]:
+        print(f"No initial_mkdirs for section {section} in config, skipping")
+        return
+    for d in config["initial_mkdirs"][section]:
         _mkdirrec(d["dir"], delete_first=d["delfirst"] if "delfirst" in d else False)
 
 
 def softlinks(config, section):
     """make all softlinks"""
+    if "links" not in config or section not in config["links"]:
+        print(f"No links for section {section} in config, skipping")
+        return
     for link in config["links"][section]:
         _softlink(link["src"], link["dst"])
 
 
 def cmds(config, systype):
     """run all commands"""
+    if "commands" not in config:
+        print("No commands in config, skipping")
+        return
     if systype in config["commands"]:
         for c in config["commands"][systype]:
             _run_cmd(c)
 
 
-def packages(config, systype):
-    """install all packages"""
-    inner = config["packages"][systype]
-    print(f"Sections to process: {inner} for systpe {systype}")
-    for ptype in inner:
+def _install_packages(inner, label):
+    """
+    Internal function to install packages from a dict of package types.
+    label is used for logging (e.g., "systype ubuntu" or "loctype work")
+    """
+    # Use cross-platform order as default since env-specific packages won't have OS-specific types
+    # Process in defined order, only if present in config
+    ptypes_to_process = [p for p in ALL_KNOWN_PACKAGE_TYPES if p in inner]
+    # Add any unknown types at the end (future-proofing)
+    ptypes_to_process += [p for p in inner if p not in ALL_KNOWN_PACKAGE_TYPES]
+    print(f"Sections to process: {ptypes_to_process} for {label}")
+    for ptype in ptypes_to_process:
         print(f"Processing {ptype}")
         match ptype:
             case "brew_tap":
@@ -122,38 +144,51 @@ def packages(config, systype):
             case "brew":
                 # sometimes brew will return a status of 1 in cases where it's "fine"
                 _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
+            case "brew_cask":
+                _run_cmd("brew install --cask " + " ".join(inner["brew_cask"]), shortcircuit=False)
             case "yay":
                 _run_cmd("yay -S {0} --noconfirm".format(" ".join(inner["yay"])))
             case "pacman":
                 _run_cmd("sudo pacman -S {0} --noconfirm".format(" ".join(inner["pacman"])))
+            case "ppa":
+                # Ubuntu PPAs - must be added before apt install
+                for ppa in inner["ppa"]:
+                    _run_cmd(f"sudo add-apt-repository -y {ppa}", shortcircuit=False)
+                _run_cmd("sudo apt-get update")
             case "apt":
                 _run_cmd("sudo apt-get install -y {0}".format(" ".join(inner["apt"])))
+            case "snap":
+                # some snaps need --classic, specify as "package --classic" in config
+                for pkg in inner["snap"]:
+                    _run_cmd(f"sudo snap install {pkg}", shortcircuit=False)
             # note, these could be in "all" or package specific
             case "fisher":
                 _run_cmd("fisher install " + " ".join(inner["fisher"]))
             case "npm":
-                _run_cmd("npm install {0} -g".format(" ".join(inner["npm"])))
-            case "pip":
-                for pkg in inner["pip"]:
-                    _pipinstall(pkg)
+                _run_cmd("sudo npm install {0} -g".format(" ".join(inner["npm"])))
+            case "go_install":
+                for pkg in inner["go_install"]:
+                    _run_cmd(f"go install {pkg}")
+            case "cargo":
+                for pkg in inner["cargo"]:
+                    # Use full path to cargo in case it was installed via rustup
+                    _run_cmd(f"$HOME/.cargo/bin/cargo install {pkg}")
             case _:
-                # TODO: have a json schema validate
                 raise ValueError(f"Unsupported package type {ptype}!")
 
 
-def vim():
-    """
-    install my custom vim setup
-    TODO: this should be written as some kind of user-pluiginable-function
-    """
-    _mkdirrec("~/.vim/plugged", delete_first=True)
+def prereq_packages(config, systype):
+    """install prerequisite packages (rust/cargo, go, poetry) for a given systype"""
+    if "prereq_packages" not in config or systype not in config["prereq_packages"]:
+        print(f"No prereq_packages defined for systype {systype}, skipping")
+        return
+    print(f"\n=== Installing prerequisite packages for {systype} ===")
+    _install_packages(config["prereq_packages"][systype], f"prereq {systype}")
 
-    print("\nthe following vim command takes some time, be patient!\n")
-    # https://github.com/junegunn/vim-plug/issues/225
-    # have used:  vim +PlugInstall +qall +silent >/dev/null
-    _run_cmd("vim +PlugInstall +qall")
 
-    # This is my attempt to run coc installs then exit
-    # this definitely runs when run within vim, but questionable on the CMD line
-    # https://github.com/neoclide/coc.nvim/issues/3802
-    _run_cmd("vim -c 'CocInstall -sync coc-go coc-json coc-html coc-pyright coc-yaml coc-git|qall'")
+def packages(config, systype):
+    """install all packages for a given systype (mac/arch/ubuntu/all)"""
+    if "packages" not in config or systype not in config["packages"]:
+        print(f"No packages defined for systype {systype}, skipping")
+        return
+    _install_packages(config["packages"][systype], f"systype {systype}")

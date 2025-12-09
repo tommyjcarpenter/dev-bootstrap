@@ -240,15 +240,38 @@
             ]
         },
         "ubuntu": {
+            "ppa": [
+                "ppa:neovim-ppa/unstable",
+                "ppa:fish-shell/release-4"
+            ],
             "apt": [
                 "unzip",
                 "grc",
                 "docker.io",
-                "docker.compose",
-                "exa",
+                "docker-compose",
+                "eza",
                 "tox",
                 "postgresql",
-                "libpq-dev"
+                "libpq-dev",
+                "neovim",
+                "fish",
+                "ripgrep",
+                "build-essential",
+                "jq",
+                "tmux",
+                "fzf"
+            ],
+            "snap": [
+                "shfmt",
+                "yq",
+                "helm --classic",
+                "kubectl --classic"
+            ],
+            "go_install": [
+                "golang.org/x/tools/gopls@latest"
+            ],
+            "cargo": [
+                "stylua"
             ]
         }
     }

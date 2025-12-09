@@ -19,9 +19,6 @@ I am planning on making this more extensible so the user can provide functions t
 4. make a directory called `~/dotfiles/` with all of your dotfiles. I personally have a private github `dotfiles` repo. I simply clone that to use this.
 5. Write `config.json`; see the next section
 
-Optional:
-- if you want `vim` installed, your `.vimrc` should be using vim-plug.
-
 # Config.json
 To use this package, you write a `config.json` to describe what you would like linked, installed, ran, etc.
 That is the only input, other than a few cmd line parameters.
@@ -36,9 +33,37 @@ These are the major sections:
 1. `comments`: this is a list of strings for your own sanity, since JSON has no native commenting mechanism.
 2. `initial_mkdirs`: directories to be recursively made. For example, `~/.ssh/..`. You can specify whether to try deleting the directory first, which is helpful for "rebootstrapping"
 3. `links`: this is a list of softlinked dotfiles, from you `~/dotfiles` directory, that can vary by "location" if you want. IE, if you have a `.gitconfig` that you use on "work" machines, and a seperate one you use on "private" machines, you can specify these seperately, and when you run the script, you specify the location. There is also a generic `all` key for specifying location-agnostic keys.
-4. `commands`: a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. While I havent tested this on mac yet, on linux, if the command needs sudo, it will pause and ask for your sudo password using a `STDIN` pipe, so privleged commands are fine.
-5. `packages`: a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm` and `pip`. Examples of `mac` include `brew`. You can also include "agnostic" installs in the os-specific sections, for example, "I only want this NPM package installed on my mac".
+4. `commands`: a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed! If the command needs sudo, it will pause and ask for your sudo password using a `STDIN` pipe, so privileged commands are fine.
+5. `packages`: a list of packages to install, which can be specified as os-agnostic, or by OS type. You can also include "agnostic" installs in the os-specific sections, for example, "I only want this NPM package installed on my mac".
 
+Supported package managers:
+- `brew` / `brew_tap`: macOS Homebrew packages and taps
+- `pacman` / `yay`: Arch Linux packages
+- `ppa` / `apt` / `snap`: Ubuntu PPAs, apt packages, and snap packages
+- `npm`: Node.js packages (cross-platform)
+- `go_install`: Go packages via `go install` (cross-platform)
+- `cargo`: Rust packages via `cargo install` (cross-platform)
+- `fisher`: Fish shell plugins (cross-platform)
+
+Note: For Ubuntu, `ppa` entries are automatically processed before `apt` regardless of order in the config.
+
+6. `prereq_packages`: packages that provide language toolchains (rust/cargo, go, poetry) needed before other packages can be installed. These are installed before `packages`. Structure is the same as `packages` but keyed by OS only (no `all` section).
+
+## Environment-Specific Configs
+
+You can create separate config files for work vs private environments:
+- `~/dotfiles/bootstrap_config.json` - main config (always loaded)
+- `~/dotfiles/bootstrap_config_work.json` - loaded when `--loctype work`
+- `~/dotfiles/bootstrap_config_private.json` - loaded when `--loctype private`
+
+The extra config files are optional and use the same schema. They're processed after the main config, so you can put environment-specific packages (like kubernetes tools for work) in separate files.
+
+# Prerequisites
+
+1. You must have `homebrew` installed on mac, and `yay` installed on Arch linux.
+2. You must have `~/dotfiles/` directory with your dotfiles in it.
+3. You must have `config.json` file written.
+4. You must have `python3` and `poetry` installed.
 
 # Install and Running
 
@@ -47,12 +72,12 @@ These are the major sections:
 
 You can also set CMD args on the command line:
 
-    poetry run runboot --prereqs t --name tommycarpenter --redovim n --systype mac --loctype work
-    poetry run runboot --prereqs t --name tommy --redovim n --systype arch --loctype private
-    /home/ubuntu/.local/bin/poetry run runboot --prereqs t --name ubuntu --redovim y --systype ubuntu --loctype work
+    poetry run runboot --systype mac --loctype work
+    poetry run runboot --systype arch --loctype private
+    poetry run runboot --systype ubuntu --loctype work
 
-It is normally safe to run this repeatedly in an additive manner; as in, you can add packages to `config.json` and re-run.
+The script is idempotent - it is safe to run repeatedly. You can add packages to `config.json` and re-run.
 
 # Major TODOs:
 
-1. User supplied functions, and `vim()` should move to this
+1. User supplied functions

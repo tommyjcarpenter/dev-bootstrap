@@ -1,4 +1,5 @@
 import json
+import os
 
 import click
 
@@ -6,34 +7,40 @@ from bootstrap import utils
 from bootstrap.boot import boot
 from bootstrap.schema import config_validate
 
-PREREQ = "Are all prequisites met? See README"
+def load_config(path):
+    """Load and validate a config file, returns None if file doesn't exist."""
+    full_path = utils._replace_home(path)
+    if not os.path.exists(full_path):
+        return None
+    with open(full_path, "r") as f:
+        cfg = json.loads(f.read())
+    config_validate(cfg)
+    return cfg
 
 
 @click.command()
-@click.option("--prereqs", prompt=PREREQ)
-@click.option("--name", prompt="username", help="IE /users/??/")
-# useful for "rebootstrapping"
-@click.option(
-    "--redovim",
-    prompt="redo all of vim? [y] for yes, [n] for no",
-    help="redo all vim plugins?",
-)
 @click.option("--systype", prompt="enter [mac] or [arch] or [ubuntu]", help="what system?")
-@click.option("--loctype", prompt="enter [work] or [home]", help="use work or home dotfiles?")
-def main(prereqs, name, redovim, systype, loctype):
-    # TODO: we could obv get a lot fancier here
-    assert prereqs == "t"
+@click.option("--loctype", prompt="enter [work] or [private]", help="use work or private dotfiles?")
+def main(systype, loctype):
     assert systype in ["mac", "arch", "ubuntu"]
     assert loctype in ["work", "private"]
+    name = os.environ.get("USER")
 
-    with open(utils._replace_home("~/dotfiles/bootstrap_config.json"), "r") as f:
-        cfg = json.loads(f.read())
+    # Load main config
+    cfg = load_config("~/dotfiles/bootstrap_config.json")
+    if cfg is None:
+        raise FileNotFoundError("Main config ~/dotfiles/bootstrap_config.json not found!")
 
-    # validate schema
-    config_validate(cfg)
+    # Try to load environment-specific config (e.g., bootstrap_config_work.json)
+    extra_config_path = f"~/dotfiles/bootstrap_config_{loctype}.json"
+    extra_cfg = load_config(extra_config_path)
+    if extra_cfg:
+        print(f"Found extra config: {extra_config_path}")
+    else:
+        print(f"No extra config found at {extra_config_path}, skipping")
 
     # go!
-    boot(cfg, name, redovim, systype, loctype)
+    boot(cfg, name, systype, loctype, extra_cfg)
 
 
 if __name__ == "__main__":
