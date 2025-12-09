@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bootstrap"
-version = "1.2.0"
+version = "1.2.1"
 description = "Automatic setup of new machines"
 authors = ["Tommy Carpenter <tommyjcarpenter@gmail.com>"]
 license = "MIT"
