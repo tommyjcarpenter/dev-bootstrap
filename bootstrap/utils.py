@@ -12,16 +12,18 @@ SHELLPATH = os.environ.get("SHELL")
 
 # Package installation order by OS - some types must run before others
 # (e.g., ppa before apt to add repos, brew_tap before brew)
-# Cross-platform types (npm, pip, etc.) are appended after OS-specific ones
+# Cross-platform types (npm, go_install, etc.) MUST come after OS-specific ones
+# because they depend on tools installed by OS package managers (e.g., npm from nodejs)
 CROSS_PLATFORM_PACKAGE_ORDER = ["npm", "go_install", "cargo", "fisher"]
+OS_SPECIFIC_PACKAGE_ORDER = ["brew_tap", "brew", "brew_cask", "pacman", "yay", "ppa", "apt", "snap"]
 PACKAGE_ORDER = {
     "mac": ["brew_tap", "brew", "brew_cask"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "arch": ["pacman", "yay"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "ubuntu": ["ppa", "apt", "snap"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "all": CROSS_PLATFORM_PACKAGE_ORDER,
 }
-# Derive all known package types from PACKAGE_ORDER (single source of truth)
-ALL_KNOWN_PACKAGE_TYPES = list(dict.fromkeys(pkg for order in PACKAGE_ORDER.values() for pkg in order))
+# OS-specific package types first, then cross-platform (ensures npm/go are installed before used)
+ALL_KNOWN_PACKAGE_TYPES = OS_SPECIFIC_PACKAGE_ORDER + CROSS_PLATFORM_PACKAGE_ORDER
 
 
 def _replace_home(path):

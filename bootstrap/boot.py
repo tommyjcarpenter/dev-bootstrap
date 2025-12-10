@@ -12,8 +12,8 @@ def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
     5. generic commands
     6. system specific commands
     7. prereq packages (rust/cargo, go, poetry) - only on first config
-    8. generic packages
-    9. system specific packages
+    8. system specific packages (installs npm, go, etc via pacman/brew/apt)
+    9. generic packages (uses npm, go_install, cargo, fisher)
     """
     mkdirs(cfg, "all")
     mkdirs(cfg, systype)
@@ -23,8 +23,10 @@ def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
     cmds(cfg, systype)
     if run_prereqs:
         prereq_packages(cfg, systype)
-    packages(cfg, "all")
+    # systype packages first (installs npm, go, etc via pacman/brew/apt)
+    # then "all" packages (uses npm, go_install, etc)
     packages(cfg, systype)
+    packages(cfg, "all")
 
 
 def boot(cfg: dict, name, systype, loctype, extra_cfg: dict = None):
