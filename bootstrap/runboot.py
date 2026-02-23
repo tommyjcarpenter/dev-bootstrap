@@ -1,11 +1,34 @@
 import json
 import os
+import sys
 
 import click
 
-from bootstrap import utils
+from bootstrap import log, utils
 from bootstrap.boot import boot
 from bootstrap.schema import config_validate
+
+def detect_systype():
+    """Auto-detect the system type from the current platform."""
+    if sys.platform == "darwin":
+        return "mac"
+    if sys.platform == "linux":
+        try:
+            with open("/etc/os-release") as f:
+                for line in f:
+                    if line.startswith("ID="):
+                        distro_id = line.strip().split("=", 1)[1].strip('"')
+                        if distro_id == "arch":
+                            return "arch"
+                        if distro_id == "ubuntu":
+                            return "ubuntu"
+        except FileNotFoundError:
+            pass
+    raise RuntimeError(
+        f"Could not auto-detect systype (platform={sys.platform!r}). "
+        "Please specify --systype explicitly."
+    )
+
 
 def load_config(path):
     """Load and validate a config file, returns None if file doesn't exist."""
@@ -19,9 +42,14 @@ def load_config(path):
 
 
 @click.command()
-@click.option("--systype", prompt="enter [mac] or [arch] or [ubuntu]", help="what system?")
+@click.option("--systype", default=None, help="System type: mac, arch, or ubuntu (auto-detected if omitted)")
 @click.option("--loctype", prompt="enter [work] or [private]", help="use work or private dotfiles?")
 def main(systype, loctype):
+    if systype is None:
+        systype = detect_systype()
+        log.info(f"Auto-detected systype: {systype}")
+    else:
+        log.info(f"Using specified systype: {systype}")
     assert systype in ["mac", "arch", "ubuntu"]
     assert loctype in ["work", "private"]
     name = os.environ.get("USER")
@@ -35,9 +63,9 @@ def main(systype, loctype):
     extra_config_path = f"~/dotfiles/bootstrap_config_{loctype}.json"
     extra_cfg = load_config(extra_config_path)
     if extra_cfg:
-        print(f"Found extra config: {extra_config_path}")
+        log.info(f"Found extra config: {extra_config_path}")
     else:
-        print(f"No extra config found at {extra_config_path}, skipping")
+        log.skip(f"No extra config found at {extra_config_path}")
 
     # go!
     boot(cfg, name, systype, loctype, extra_cfg)

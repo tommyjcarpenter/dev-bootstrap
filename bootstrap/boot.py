@@ -1,3 +1,4 @@
+from bootstrap import log
 from bootstrap.utils import cmds, mkdirs, packages, prereq_packages, softlinks
 
 
@@ -33,9 +34,9 @@ def boot(cfg: dict, name, systype, loctype, extra_cfg: dict = None):
     """
     Run the main config, then optionally run an extra config (e.g., work or private specific).
     """
-    print("=== Processing main config ===")
+    log.header("Processing main config")
     boot_config(cfg, systype, loctype, run_prereqs=True)
 
     if extra_cfg:
-        print(f"\n=== Processing extra config for {loctype} ===")
+        log.header(f"Processing extra config for {loctype}")
         boot_config(extra_cfg, systype, loctype, run_prereqs=False)

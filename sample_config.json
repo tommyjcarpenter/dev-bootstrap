@@ -13,7 +13,11 @@
             "sudo apt-get install npm",
             "sudo npm install -g n",
             "sudo n stable",
-            "rm -rf ~/.pyenv/; curl https://pyenv.run | bash",
+            {
+                "cmd": "rm -rf ~/.pyenv/; curl https://pyenv.run | bash",
+                "check": "test -d ~/.pyenv && ~/.pyenv/bin/pyenv --version",
+                "label": "Install pyenv"
+            },
             "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"awscliv2.zip\"; unzip awscliv2.zip; sudo ./aws/install",
             "sudo snap install diff-so-fancy"
         ]

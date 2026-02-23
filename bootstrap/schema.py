@@ -30,13 +30,13 @@ schema = {
             },
         },
         "commands": {
-            "description": "a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!.",
+            "description": "a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. Each entry can be a plain string or an object with cmd, check, and label fields.",
             "type": "object",
             "properties": {
-                "all": {"type": "array", "items": {"type": "string"}},
-                "mac": {"type": "array", "items": {"type": "string"}},
-                "arch": {"type": "array", "items": {"type": "string"}},
-                "ubuntu": {"type": "array", "items": {"type": "string"}},
+                "all": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
+                "mac": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
+                "arch": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
+                "ubuntu": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
             },
         },
         "packages": {
@@ -79,6 +79,16 @@ schema = {
                 "src": {"type": "string"},
                 "dst": {"type": "string"},
             },
+        },
+        "command_with_check": {
+            "type": "object",
+            "required": ["cmd"],
+            "properties": {
+                "cmd": {"type": "string", "description": "The command to run."},
+                "check": {"type": "string", "description": "Shell command — if exit 0, skip cmd."},
+                "label": {"type": "string", "description": "Human-readable name for logs (defaults to truncated cmd)."},
+            },
+            "additionalProperties": False,
         },
     },
     "additionalProperties": False,
