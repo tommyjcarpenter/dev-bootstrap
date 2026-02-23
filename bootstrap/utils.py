@@ -7,6 +7,8 @@ import shutil
 import subprocess
 import sys
 
+from bootstrap import log
+
 HOMEDIR = os.environ.get("HOME")
 SHELLPATH = os.environ.get("SHELL")
 
@@ -39,13 +41,10 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
     if cwd:
         cwd = _replace_home(cwd)
 
-    print(
-        "\nRunning: {0} {1}".format(
-            " ".join(args) if isinstance(args, list) else args,
-            "from: {}".format(cwd) if cwd else "",
-        ),
-        flush=True,
-    )
+    log.cmd("{0} {1}".format(
+        " ".join(args) if isinstance(args, list) else args,
+        "from: {}".format(cwd) if cwd else "",
+    ))
 
     # does anybody actually understand how subprocess works?  ¯\_(ツ)_/¯
     proc = subprocess.Popen(
@@ -61,11 +60,11 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
     out, err = proc.communicate()
     status = proc.returncode
     if status != 0:
-        print("FAILED!", flush=True)
+        log.error("FAILED!")
         opt = "out: {0}, err: {1}".format(out, err)
-        print("Status: {0}, Output: {1}\n\n".format(status, opt))
+        log.error("Status: {0}, Output: {1}".format(status, opt))
         if shortcircuit:
-            print("Aborting due to short circuit flag, and a failure!")
+            log.error("Aborting due to short circuit flag, and a failure!")
             sys.exit(1)
 
 
@@ -73,7 +72,7 @@ def _mkdirrec(dest, delete_first=False):
     """recurisvely make a directory"""
     dest = _replace_home(dest)
     if delete_first and os.path.isdir(dest):
-        print("Remove flag is ON, and destination exists, deleting!")
+        log.action("Remove flag is ON, and destination exists, deleting!")
         shutil.rmtree(dest)
     _run_cmd("mkdir -p  " + dest)
     assert os.path.isdir(dest)
@@ -83,7 +82,7 @@ def _softlink(src, dest, cwd=None):
     """remove dest, then softline src to dest"""
     src = _replace_home(src)
     dest = _replace_home(dest)
-    print("linking {0} to {1}".format(src, dest))
+    log.action("linking {0} to {1}".format(src, dest))
     _run_cmd("ln -f -s " + src + " " + dest, cwd)
     assert os.path.exists(dest)
 
@@ -101,7 +100,7 @@ def _gitclone(repo, dest):
 def mkdirs(config, section):
     """recursively make needed dirs for a given section (all, mac, arch, ubuntu)"""
     if "initial_mkdirs" not in config or section not in config["initial_mkdirs"]:
-        print(f"No initial_mkdirs for section {section} in config, skipping")
+        log.skip(f"No initial_mkdirs for section {section} in config")
         return
     for d in config["initial_mkdirs"][section]:
         _mkdirrec(d["dir"], delete_first=d["delfirst"] if "delfirst" in d else False)
@@ -110,20 +109,45 @@ def mkdirs(config, section):
 def softlinks(config, section):
     """make all softlinks"""
     if "links" not in config or section not in config["links"]:
-        print(f"No links for section {section} in config, skipping")
+        log.skip(f"No links for section {section} in config")
         return
     for link in config["links"][section]:
         _softlink(link["src"], link["dst"])
 
 
+def _run_check(check_cmd):
+    """Run a precheck command. Returns True if check passes (exit 0)."""
+    try:
+        result = subprocess.run(
+            check_cmd,
+            shell=True,
+            executable=SHELLPATH,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=30,
+        )
+        return result.returncode == 0
+    except subprocess.TimeoutExpired:
+        return False
+
+
 def cmds(config, systype):
     """run all commands"""
     if "commands" not in config:
-        print("No commands in config, skipping")
+        log.skip("No commands in config")
         return
     if systype in config["commands"]:
         for c in config["commands"][systype]:
-            _run_cmd(c)
+            if isinstance(c, str):
+                _run_cmd(c)
+            else:
+                label = c.get("label") or c["cmd"][:60]
+                if "check" in c:
+                    log.info(f"Precheck for: {label}")
+                    if _run_check(c["check"]):
+                        log.skip(f"Precheck passed, skipping: {label}")
+                        continue
+                _run_cmd(c["cmd"])
 
 
 def _install_packages(inner, label):
@@ -136,9 +160,9 @@ def _install_packages(inner, label):
     ptypes_to_process = [p for p in ALL_KNOWN_PACKAGE_TYPES if p in inner]
     # Add any unknown types at the end (future-proofing)
     ptypes_to_process += [p for p in inner if p not in ALL_KNOWN_PACKAGE_TYPES]
-    print(f"Sections to process: {ptypes_to_process} for {label}")
+    log.info(f"Sections to process: {ptypes_to_process} for {label}")
     for ptype in ptypes_to_process:
-        print(f"Processing {ptype}")
+        log.info(f"Processing {ptype}")
         match ptype:
             case "brew_tap":
                 for tap in inner["brew_tap"]:
@@ -182,15 +206,15 @@ def _install_packages(inner, label):
 def prereq_packages(config, systype):
     """install prerequisite packages (rust/cargo, go, poetry) for a given systype"""
     if "prereq_packages" not in config or systype not in config["prereq_packages"]:
-        print(f"No prereq_packages defined for systype {systype}, skipping")
+        log.skip(f"No prereq_packages defined for systype {systype}")
         return
-    print(f"\n=== Installing prerequisite packages for {systype} ===")
+    log.header(f"Installing prerequisite packages for {systype}")
     _install_packages(config["prereq_packages"][systype], f"prereq {systype}")
 
 
 def packages(config, systype):
     """install all packages for a given systype (mac/arch/ubuntu/all)"""
     if "packages" not in config or systype not in config["packages"]:
-        print(f"No packages defined for systype {systype}, skipping")
+        log.skip(f"No packages defined for systype {systype}")
         return
     _install_packages(config["packages"][systype], f"systype {systype}")
