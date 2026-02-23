@@ -70,6 +70,11 @@ schema = {
                     "description": "try to remove the directory before making?",
                     "default": False,
                 },
+                "sudo": {
+                    "type": "boolean",
+                    "description": "run with sudo (for system directories outside ~)",
+                    "default": False,
+                },
             },
         },
         "link": {
@@ -78,6 +83,11 @@ schema = {
             "properties": {
                 "src": {"type": "string"},
                 "dst": {"type": "string"},
+                "sudo": {
+                    "type": "boolean",
+                    "description": "run with sudo (for system directories outside ~)",
+                    "default": False,
+                },
             },
         },
         "command_with_check": {

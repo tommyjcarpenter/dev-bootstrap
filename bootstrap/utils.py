@@ -70,22 +70,24 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
             sys.exit(1)
 
 
-def _mkdirrec(dest, delete_first=False):
+def _mkdirrec(dest, delete_first=False, sudo=False):
     """recurisvely make a directory"""
     dest = _replace_home(dest)
     if delete_first and os.path.isdir(dest):
         log.action("Remove flag is ON, and destination exists, deleting!")
         shutil.rmtree(dest)
-    _run_cmd("mkdir -p  " + dest)
+    prefix = "sudo " if sudo else ""
+    _run_cmd(prefix + "mkdir -p  " + dest)
     assert os.path.isdir(dest)
 
 
-def _softlink(src, dest, cwd=None):
+def _softlink(src, dest, cwd=None, sudo=False):
     """remove dest, then softline src to dest"""
     src = _replace_home(src)
     dest = _replace_home(dest)
     log.action(f"linking {src} to {dest}")
-    _run_cmd("ln -f -n -s " + src + " " + dest, cwd)
+    prefix = "sudo " if sudo else ""
+    _run_cmd(prefix + "ln -f -n -s " + src + " " + dest, cwd)
     assert os.path.exists(dest)
 
 
@@ -105,7 +107,7 @@ def mkdirs(config, section):
         log.skip(f"No initial_mkdirs for section {section} in config")
         return
     for d in config["initial_mkdirs"][section]:
-        _mkdirrec(d["dir"], delete_first=d["delfirst"] if "delfirst" in d else False)
+        _mkdirrec(d["dir"], delete_first=d.get("delfirst", False), sudo=d.get("sudo", False))
 
 
 def softlinks(config, section):
@@ -114,7 +116,7 @@ def softlinks(config, section):
         log.skip(f"No links for section {section} in config")
         return
     for link in config["links"][section]:
-        _softlink(link["src"], link["dst"])
+        _softlink(link["src"], link["dst"], sudo=link.get("sudo", False))
 
 
 def _run_check(check_cmd):
