@@ -41,10 +41,12 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
     if cwd:
         cwd = _replace_home(cwd)
 
-    log.cmd("{0} {1}".format(
-        " ".join(args) if isinstance(args, list) else args,
-        "from: {}".format(cwd) if cwd else "",
-    ))
+    log.cmd(
+        "{0} {1}".format(
+            " ".join(args) if isinstance(args, list) else args,
+            f"from: {cwd}" if cwd else "",
+        )
+    )
 
     # does anybody actually understand how subprocess works?  ¯\_(ツ)_/¯
     proc = subprocess.Popen(
@@ -61,8 +63,8 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
     status = proc.returncode
     if status != 0:
         log.error("FAILED!")
-        opt = "out: {0}, err: {1}".format(out, err)
-        log.error("Status: {0}, Output: {1}".format(status, opt))
+        opt = f"out: {out}, err: {err}"
+        log.error(f"Status: {status}, Output: {opt}")
         if shortcircuit:
             log.error("Aborting due to short circuit flag, and a failure!")
             sys.exit(1)
@@ -82,8 +84,8 @@ def _softlink(src, dest, cwd=None):
     """remove dest, then softline src to dest"""
     src = _replace_home(src)
     dest = _replace_home(dest)
-    log.action("linking {0} to {1}".format(src, dest))
-    _run_cmd("ln -f -s " + src + " " + dest, cwd)
+    log.action(f"linking {src} to {dest}")
+    _run_cmd("ln -f -n -s " + src + " " + dest, cwd)
     assert os.path.exists(dest)
 
 
