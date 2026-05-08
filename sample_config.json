@@ -1,6 +1,7 @@
 {
     "comments": [
         "Comments live here since JSON has no native commenting mechanism.",
+        "All sections except `comments` are processed by the engine.",
         "Use bootstrap_config_work.json / bootstrap_config_private.json for env-specific overlays."
     ],
     "initial_mkdirs": {
@@ -15,6 +16,9 @@
         ],
         "ubuntu": [
             { "dir": "~/.config/kitty" }
+        ],
+        "windows": [
+            { "dir": "~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState" }
         ]
     },
     "links": {
@@ -22,7 +26,8 @@
             { "src": "~/dotfiles/init.lua",        "dst": "~/.config/nvim/init.lua" },
             { "src": "~/dotfiles/tmux.conf",       "dst": "~/.tmux.conf" },
             { "src": "~/dotfiles/yamllint-config", "dst": "~/.config/yamllint/config" },
-            { "src": "~/dotfiles/gitconfig",       "dst": "~/.gitconfig" }
+            { "src": "~/dotfiles/gitconfig",       "dst": "~/.gitconfig" },
+            { "src": "~/dotfiles/starship.toml",   "dst": "~/.config/starship.toml" }
         ],
         "mac": [],
         "arch": [
@@ -30,6 +35,10 @@
         ],
         "ubuntu": [
             { "src": "~/dotfiles/kitty.conf", "dst": "~/.config/kitty/kitty.conf" }
+        ],
+        "windows": [
+            { "src": "~/dotfiles/windows-terminal-settings.json",
+              "dst": "~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json" }
         ]
     },
     "commands": {
@@ -48,6 +57,23 @@
                 "cmd": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y",
                 "check": "rustc --version",
                 "label": "Install Rust toolchain"
+            }
+        ],
+        "windows": [
+            {
+                "cmd": "pwsh -NoProfile -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; iwr -useb get.scoop.sh | iex\"",
+                "check": "scoop --version",
+                "label": "Install scoop"
+            },
+            {
+                "cmd": "winget install --id Rustlang.Rustup -e --silent --accept-source-agreements --accept-package-agreements",
+                "check": "rustup --version",
+                "label": "Install Rustup"
+            },
+            {
+                "cmd": "rustup default stable",
+                "check": "rustup show active-toolchain",
+                "label": "Install + select stable Rust toolchain"
             }
         ]
     },
@@ -73,6 +99,9 @@
                 "eza",
                 "fzf",
                 "jq",
+                "stylua",
+                "ruff",
+                "black",
                 "pyright",
                 "yaml-language-server",
                 "bash-language-server",
@@ -81,13 +110,50 @@
         },
         "arch": {
             "pacman": ["nodejs", "tmux", "eza", "kitty"],
-            "yay": ["jq"]
+            "yay": ["jq", "ruff", "stylua"]
         },
         "ubuntu": {
             "apt": ["neovim", "ripgrep", "tmux", "fzf", "jq"],
             "npm": ["pyright", "yaml-language-server", "bash-language-server"],
             "go_install": ["golang.org/x/tools/gopls@latest"],
             "cargo": ["stylua"]
+        },
+        "windows": {
+            "winget": [
+                "Neovim.Neovim",
+                "Git.Git",
+                "Starship.Starship",
+                "Microsoft.WindowsTerminal",
+                "OpenJS.NodeJS.LTS"
+            ],
+            "scoop_bucket": ["main", "nerd-fonts"],
+            "scoop": [
+                "eza", "bat", "fzf", "ripgrep", "jq", "fd", "zoxide",
+                "delta", "ruff", "shfmt", "stylua", "zig",
+                "VictorMono-NF-Mono"
+            ],
+            "pip": ["black", "isort"],
+            "npm": ["pyright", "yaml-language-server", "bash-language-server", "vscode-langservers-extracted"]
         }
+    },
+    "file_associations": {
+        "windows": [
+            {
+                "ext": ".yaml",
+                "progid": "Neovim.YAML",
+                "cmd": "wt -- nvim \"%1\"",
+                "name": "Neovim",
+                "icon": "~/dotfiles/icons/neovim.ico",
+                "label": "open .yaml in Neovim (via Windows Terminal)"
+            },
+            {
+                "ext": ".txt",
+                "progid": "Neovim.TXT",
+                "cmd": "wt -- nvim \"%1\"",
+                "name": "Neovim",
+                "icon": "~/dotfiles/icons/neovim.ico",
+                "label": "open .txt in Neovim (via Windows Terminal)"
+            }
+        ]
     }
 }

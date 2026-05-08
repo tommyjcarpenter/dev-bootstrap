@@ -13,6 +13,8 @@ def detect_systype():
     """Auto-detect the system type from the current platform."""
     if sys.platform == "darwin":
         return "mac"
+    if sys.platform == "win32":
+        return "windows"
     if sys.platform == "linux":
         try:
             with open("/etc/os-release") as f:
@@ -42,15 +44,10 @@ def load_config(path):
 
 
 @click.command()
-@click.option("--systype", default=None, help="System type: mac, arch, or ubuntu (auto-detected if omitted)")
 @click.option("--loctype", prompt="enter [work] or [private]", help="use work or private dotfiles?")
-def main(systype, loctype):
-    if systype is None:
-        systype = detect_systype()
-        log.info(f"Auto-detected systype: {systype}")
-    else:
-        log.info(f"Using specified systype: {systype}")
-    assert systype in ["mac", "arch", "ubuntu"]
+def main(loctype):
+    systype = detect_systype()
+    log.info(f"Detected systype: {systype}")
     assert loctype in ["work", "private"]
     name = os.environ.get("USER")
 
