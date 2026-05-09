@@ -1,27 +1,39 @@
-"""
-install everything
-"""
+"""install everything"""
 
 import os
 import shutil
 import subprocess
 import sys
 
-from bootstrap import log
+from bootstrap import log, windows
 
-HOMEDIR = os.environ.get("HOME")
-SHELLPATH = os.environ.get("SHELL")
+HOMEDIR = os.path.expanduser("~")
+SHELLPATH = os.environ.get("SHELL")  # None on Windows; subprocess defaults to %COMSPEC% (cmd.exe)
 
-# Package installation order by OS - some types must run before others
-# (e.g., ppa before apt to add repos, brew_tap before brew)
-# Cross-platform types (npm, go_install, etc.) MUST come after OS-specific ones
-# because they depend on tools installed by OS package managers (e.g., npm from nodejs)
-CROSS_PLATFORM_PACKAGE_ORDER = ["npm", "go_install", "cargo", "fisher"]
-OS_SPECIFIC_PACKAGE_ORDER = ["brew_tap", "brew", "brew_cask", "pacman", "yay", "ppa", "apt", "snap"]
+
+# Package installation order by OS — some types must run before others (e.g. ppa before apt to add
+# repos, brew_tap before brew). Cross-platform types (npm, go_install, etc.) MUST come after the
+# OS-specific ones because they depend on tools installed by the OS package managers (e.g. npm
+# comes from nodejs, go_install needs a Go toolchain).
+CROSS_PLATFORM_PACKAGE_ORDER = ["pip", "npm", "go_install", "cargo", "fisher"]
+OS_SPECIFIC_PACKAGE_ORDER = [
+    "brew_tap",
+    "brew",
+    "brew_cask",
+    "pacman",
+    "yay",
+    "ppa",
+    "apt",
+    "snap",
+    "winget",
+    "scoop_bucket",
+    "scoop",
+]
 PACKAGE_ORDER = {
     "mac": ["brew_tap", "brew", "brew_cask"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "arch": ["pacman", "yay"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "ubuntu": ["ppa", "apt", "snap"] + CROSS_PLATFORM_PACKAGE_ORDER,
+    "windows": ["winget", "scoop_bucket", "scoop"] + CROSS_PLATFORM_PACKAGE_ORDER,
     "all": CROSS_PLATFORM_PACKAGE_ORDER,
 }
 # OS-specific package types first, then cross-platform (ensures npm/go are installed before used)
@@ -69,33 +81,53 @@ def _run_cmd(args, cwd=None, shortcircuit=True):
             log.error("Aborting due to short circuit flag, and a failure!")
             sys.exit(1)
 
+    windows.refresh_path()
+
 
 def _mkdirrec(dest, delete_first=False, sudo=False):
-    """recurisvely make a directory"""
+    """recursively make a directory (cross-platform via os.makedirs)"""
     dest = _replace_home(dest)
     if delete_first and os.path.isdir(dest):
         log.action("Remove flag is ON, and destination exists, deleting!")
-        shutil.rmtree(dest)
-    prefix = "sudo " if sudo else ""
-    _run_cmd(prefix + "mkdir -p  " + dest)
+        if sudo:
+            _run_cmd("sudo rm -rf " + dest)
+        else:
+            shutil.rmtree(dest)
+    if sudo:
+        # sudo paths still shell out — they're rare and platform-specific (linux only)
+        _run_cmd("sudo mkdir -p " + dest)
+    else:
+        log.action(f"mkdir -p {dest}")
+        os.makedirs(dest, exist_ok=True)
     assert os.path.isdir(dest)
 
 
 def _softlink(src, dest, cwd=None, sudo=False):
-    """remove dest, then softline src to dest"""
+    """remove dest if present, then symlink src -> dest (cross-platform via os.symlink)
+
+    On Windows, requires Developer Mode to be enabled (or running as admin) so that
+    os.symlink succeeds without SeCreateSymbolicLinkPrivilege.
+    """
     src = _replace_home(src)
     dest = _replace_home(dest)
     log.action(f"linking {src} to {dest}")
-    prefix = "sudo " if sudo else ""
-    _run_cmd(prefix + "ln -f -n -s " + src + " " + dest, cwd)
-    assert os.path.exists(dest)
 
+    if sudo:
+        # sudo path: shell out (rare, linux-only for system paths like /usr/share/...)
+        _run_cmd("sudo ln -f -n -s " + src + " " + dest, cwd)
+        assert os.path.exists(dest)
+        return
 
-def _gitclone(repo, dest):
-    """clone a git repo"""
-    dest = _replace_home(dest)
-    _run_cmd("git clone " + repo + " " + dest)
-    assert os.path.isdir(dest)
+    # Remove existing dest (file, dir-symlink, or broken symlink)
+    if os.path.lexists(dest):
+        if os.path.isdir(dest) and not os.path.islink(dest):
+            # Real directory at dest — refuse to clobber, mirrors `ln -n` behavior
+            raise RuntimeError(f"Refusing to replace real directory at {dest}")
+        os.unlink(dest)
+
+    # target_is_directory matters on Windows (file-symlink vs dir-symlink are different there)
+    os.symlink(src, dest, target_is_directory=os.path.isdir(src))
+    assert os.path.exists(dest) or os.path.islink(dest)
 
 
 # These take the config and execute a series of installs:
@@ -121,6 +153,7 @@ def softlinks(config, section):
 
 def _run_check(check_cmd):
     """Run a precheck command. Returns True if check passes (exit 0)."""
+    windows.refresh_path()
     try:
         result = subprocess.run(
             check_cmd,
@@ -191,11 +224,31 @@ def _install_packages(inner, label):
                 # some snaps need --classic, specify as "package --classic" in config
                 for pkg in inner["snap"]:
                     _run_cmd(f"sudo snap install {pkg}", shortcircuit=False)
-            # note, these could be in "all" or package specific
+            case "winget":
+                windows.install_winget_packages(inner["winget"], _run_cmd)
+            case "scoop_bucket":
+                for bucket in inner["scoop_bucket"]:
+                    _run_cmd(f"scoop bucket add {bucket}", shortcircuit=False)
+            case "scoop":
+                # one at a time so a single missing manifest or transient failure doesn't take
+                # out the rest of the batch — `scoop install P1 P2 P3` stops at the first error
+                for pkg in inner["scoop"]:
+                    _run_cmd(f"scoop install {pkg}", shortcircuit=False)
+            # the package types below can appear in "all" or in any OS-specific section
             case "fisher":
                 _run_cmd("fisher install " + " ".join(inner["fisher"]))
             case "npm":
-                _run_cmd("sudo npm install {0} -g".format(" ".join(inner["npm"])))
+                # Windows npm has no sudo and doesn't need it; POSIX requires sudo for -g installs
+                prefix = "" if sys.platform == "win32" else "sudo "
+                _run_cmd("{0}npm install {1} -g".format(prefix, " ".join(inner["npm"])))
+            case "pip":
+                # Windows: winget Python is a per-user install at %LOCALAPPDATA%\Programs\Python\PythonXX\
+                # whose Scripts dir is already on PATH; plain `pip install` writes there. We deliberately
+                # AVOID --user on Windows because that puts scripts under %APPDATA%\Python\PythonXX\Scripts
+                # which is NOT on PATH by default, making tools "installed but invisible".
+                # POSIX: --user is needed for system Pythons (PEP 668 / apt protection).
+                cmd = "python -m pip install" if sys.platform == "win32" else "python3 -m pip install --user"
+                _run_cmd("{0} {1}".format(cmd, " ".join(inner["pip"])), shortcircuit=False)
             case "go_install":
                 for pkg in inner["go_install"]:
                     _run_cmd(f"go install {pkg}")

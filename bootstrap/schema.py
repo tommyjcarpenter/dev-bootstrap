@@ -10,23 +10,25 @@ schema = {
             "items": {"type": "string"},
         },
         "initial_mkdirs": {
-            "description": "directories to be recursively made, organized by OS type. Use 'all' for cross-platform dirs, and 'mac'/'arch'/'ubuntu' for OS-specific dirs.",
+            "description": "directories to be recursively made, organized by OS type. Use 'all' for cross-platform dirs, and 'mac'/'arch'/'ubuntu'/'windows' for OS-specific dirs.",
             "type": "object",
             "properties": {
                 "all": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
                 "mac": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
                 "arch": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
                 "ubuntu": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
+                "windows": {"type": "array", "items": {"$ref": "#/definitions/dir"}},
             },
         },
         "links": {
-            "description": "softlinked dotfiles from ~/dotfiles, organized by OS type. Use 'all' for cross-platform links, and 'mac'/'arch'/'ubuntu' for OS-specific links. For work/private specific links, put them in the respective bootstrap_config_work.json or bootstrap_config_private.json files under links.all.",
+            "description": "softlinked dotfiles from ~/dotfiles, organized by OS type. Use 'all' for cross-platform links, and 'mac'/'arch'/'ubuntu'/'windows' for OS-specific links. For work/private specific links, put them in the respective bootstrap_config_work.json or bootstrap_config_private.json files under links.all.",
             "type": "object",
             "properties": {
                 "all": {"type": "array", "items": {"$ref": "#/definitions/link"}},
                 "mac": {"type": "array", "items": {"$ref": "#/definitions/link"}},
                 "arch": {"type": "array", "items": {"$ref": "#/definitions/link"}},
                 "ubuntu": {"type": "array", "items": {"$ref": "#/definitions/link"}},
+                "windows": {"type": "array", "items": {"$ref": "#/definitions/link"}},
             },
         },
         "commands": {
@@ -49,6 +51,10 @@ schema = {
                     "type": "array",
                     "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
                 },
+                "windows": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
             },
         },
         "packages": {
@@ -58,6 +64,7 @@ schema = {
                 "mac": {"type": "object"},
                 "arch": {"type": "object"},
                 "ubuntu": {"type": "object"},
+                "windows": {"type": "object"},
                 "all": {"type": "object"},
             },
         },
@@ -68,7 +75,19 @@ schema = {
                 "mac": {"type": "object"},
                 "arch": {"type": "object"},
                 "ubuntu": {"type": "object"},
+                "windows": {"type": "object"},
             },
+        },
+        "file_associations": {
+            "description": "Register file extension associations. Currently Windows-only — writes per-user keys under HKCU\\Software\\Classes so Explorer double-click opens the right app. No admin needed.",
+            "type": "object",
+            "properties": {
+                "windows": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/file_assoc"},
+                },
+            },
+            "additionalProperties": False,
         },
     },
     "definitions": {
@@ -109,6 +128,25 @@ schema = {
                 "cmd": {"type": "string", "description": "The command to run."},
                 "check": {"type": "string", "description": "Shell command — if exit 0, skip cmd."},
                 "label": {"type": "string", "description": "Human-readable name for logs (defaults to truncated cmd)."},
+            },
+            "additionalProperties": False,
+        },
+        "file_assoc": {
+            "type": "object",
+            "required": ["ext", "progid", "cmd"],
+            "properties": {
+                "ext": {"type": "string", "description": "Extension including the dot, e.g. '.yaml'"},
+                "progid": {"type": "string", "description": "Class identifier, e.g. 'Neovim.YAML'"},
+                "cmd": {"type": "string", "description": "Launch command — Windows substitutes %1 with the file path"},
+                "name": {
+                    "type": "string",
+                    "description": "Friendly app name shown in the 'Open with' picker (otherwise Windows reads metadata from the first .exe in `cmd`, which is often blank or labeled 'Shim')",
+                },
+                "icon": {
+                    "type": "string",
+                    "description": "Icon for files of this type in Explorer. Format: '<path>,<index>' to pull a PE resource (e.g. 'C:\\\\Program Files\\\\Neovim\\\\bin\\\\nvim.exe,0'), or a path to a .ico file.",
+                },
+                "label": {"type": "string", "description": "Human-readable label for logs"},
             },
             "additionalProperties": False,
         },
