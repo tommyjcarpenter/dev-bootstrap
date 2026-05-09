@@ -5,7 +5,8 @@ import shutil
 import subprocess
 import sys
 
-from bootstrap import log, windows
+from bootstrap import log
+from bootstrap.os_specific import arch, mac, ubuntu, windows
 
 HOMEDIR = os.path.expanduser("~")
 SHELLPATH = os.environ.get("SHELL")  # None on Windows; subprocess defaults to %COMSPEC% (cmd.exe)
@@ -202,28 +203,21 @@ def _install_packages(inner, label):
         log.info(f"Processing {ptype}")
         match ptype:
             case "brew_tap":
-                for tap in inner["brew_tap"]:
-                    _run_cmd("brew tap " + tap, shortcircuit=False)
+                mac.install_brew_taps(inner["brew_tap"], _run_cmd)
             case "brew":
-                # sometimes brew will return a status of 1 in cases where it's "fine"
-                _run_cmd("brew install " + " ".join(inner["brew"]), shortcircuit=False)
+                mac.install_brew_packages(inner["brew"], _run_cmd)
             case "brew_cask":
-                _run_cmd("brew install --cask " + " ".join(inner["brew_cask"]), shortcircuit=False)
+                mac.install_brew_cask_packages(inner["brew_cask"], _run_cmd)
             case "yay":
-                _run_cmd("yay -S {0} --noconfirm".format(" ".join(inner["yay"])))
+                arch.install_yay_packages(inner["yay"], _run_cmd)
             case "pacman":
-                _run_cmd("sudo pacman -S {0} --noconfirm".format(" ".join(inner["pacman"])))
+                arch.install_pacman_packages(inner["pacman"], _run_cmd)
             case "ppa":
-                # Ubuntu PPAs - must be added before apt install
-                for ppa in inner["ppa"]:
-                    _run_cmd(f"sudo add-apt-repository -y {ppa}", shortcircuit=False)
-                _run_cmd("sudo apt-get update")
+                ubuntu.install_ppas(inner["ppa"], _run_cmd)
             case "apt":
-                _run_cmd("sudo apt-get install -y {0}".format(" ".join(inner["apt"])))
+                ubuntu.install_apt_packages(inner["apt"], _run_cmd)
             case "snap":
-                # some snaps need --classic, specify as "package --classic" in config
-                for pkg in inner["snap"]:
-                    _run_cmd(f"sudo snap install {pkg}", shortcircuit=False)
+                ubuntu.install_snap_packages(inner["snap"], _run_cmd)
             case "winget":
                 windows.install_winget_packages(inner["winget"], _run_cmd)
             case "scoop_bucket":

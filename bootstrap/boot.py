@@ -1,6 +1,6 @@
 from bootstrap import log
+from bootstrap.os_specific.windows import install_file_associations
 from bootstrap.utils import cmds, mkdirs, packages, prereq_packages, softlinks
-from bootstrap.windows import install_file_associations
 
 
 def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
