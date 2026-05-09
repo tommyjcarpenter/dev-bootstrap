@@ -1,0 +1,33 @@
+name: Schema
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-sample:
+    name: Validate sample_config.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install jsonschema
+        run: pip install 'jsonschema>=4.14.0'
+
+      - name: Validate sample_config.json against bootstrap/schema.py
+        run: |
+          python - <<'PY'
+          import json
+          from bootstrap.schema import config_validate
+          with open("sample_config.json") as f:
+              cfg = json.load(f)
+          config_validate(cfg)
+          print("sample_config.json is valid")
+          PY
