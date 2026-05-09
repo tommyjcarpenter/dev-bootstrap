@@ -33,10 +33,22 @@ schema = {
             "description": "a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. Each entry can be a plain string or an object with cmd, check, and label fields.",
             "type": "object",
             "properties": {
-                "all": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
-                "mac": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
-                "arch": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
-                "ubuntu": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]}},
+                "all": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "mac": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "arch": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "ubuntu": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
             },
         },
         "packages": {

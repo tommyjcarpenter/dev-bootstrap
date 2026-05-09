@@ -8,6 +8,7 @@ from bootstrap import log, utils
 from bootstrap.boot import boot
 from bootstrap.schema import config_validate
 
+
 def detect_systype():
     """Auto-detect the system type from the current platform."""
     if sys.platform == "darwin":
@@ -25,8 +26,7 @@ def detect_systype():
         except FileNotFoundError:
             pass
     raise RuntimeError(
-        f"Could not auto-detect systype (platform={sys.platform!r}). "
-        "Please specify --systype explicitly."
+        f"Could not auto-detect systype (platform={sys.platform!r}). Please specify --systype explicitly."
     )
 
 
