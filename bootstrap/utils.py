@@ -127,7 +127,17 @@ def _softlink(src, dest, cwd=None, sudo=False):
         os.unlink(dest)
 
     # target_is_directory matters on Windows (file-symlink vs dir-symlink are different there)
-    os.symlink(src, dest, target_is_directory=os.path.isdir(src))
+    try:
+        os.symlink(src, dest, target_is_directory=os.path.isdir(src))
+    except OSError as e:
+        if sys.platform == "win32" and getattr(e, "winerror", None) == 1314:
+            raise RuntimeError(
+                f"Cannot create symlink {dest} -> {src}: "
+                "this Windows account lacks SeCreateSymbolicLinkPrivilege. "
+                "Enable Developer Mode (Settings -> System -> For developers -> Developer Mode) "
+                "or re-run bootstrap from an elevated (admin) shell."
+            ) from e
+        raise
     assert os.path.exists(dest) or os.path.islink(dest)
 
 
