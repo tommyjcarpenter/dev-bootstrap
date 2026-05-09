@@ -32,30 +32,12 @@ schema = {
             },
         },
         "commands": {
-            "description": "a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. Each entry can be a plain string or an object with cmd, check, and label fields.",
-            "type": "object",
-            "properties": {
-                "all": {
-                    "type": "array",
-                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
-                },
-                "mac": {
-                    "type": "array",
-                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
-                },
-                "arch": {
-                    "type": "array",
-                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
-                },
-                "ubuntu": {
-                    "type": "array",
-                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
-                },
-                "windows": {
-                    "type": "array",
-                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
-                },
-            },
+            "description": "a list of arbitrary commands to run, which can be specified as os-agnostic, or by OS type. Warning, whatever you put here will be executed!. Each entry can be a plain string or an object with cmd, check, and label fields. Runs *before* packages — use it for things package install depends on (e.g. installing scoop).",
+            "$ref": "#/definitions/commands_section",
+        },
+        "post_commands": {
+            "description": "Same shape as `commands`, but runs *after* packages and file_associations. Use this for steps that depend on packages already being installed — e.g. registering a font file that scoop installed but didn't put in the user font registry.",
+            "$ref": "#/definitions/commands_section",
         },
         "packages": {
             "description": "a list of packages to install, which can be specified as os-agnostic, or by OS type. Examples of agnostic installs include `npm`. Examples of `mac` include `brew`. You can also include 'agnostic' installs in the os-specific sections, for example, 'I only want this NPM package installed on my mac'.",
@@ -132,6 +114,31 @@ schema = {
                 "label": {"type": "string", "description": "Human-readable name for logs (defaults to truncated cmd)."},
             },
             "additionalProperties": False,
+        },
+        "commands_section": {
+            "type": "object",
+            "properties": {
+                "all": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "mac": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "arch": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "ubuntu": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+                "windows": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"$ref": "#/definitions/command_with_check"}]},
+                },
+            },
         },
         "package_list": {
             "type": "array",

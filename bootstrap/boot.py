@@ -17,6 +17,8 @@ def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
      8. system specific packages (installs npm, go, etc via pacman/brew/apt/winget)
      9. generic packages (uses pip, npm, go_install, cargo, fisher)
     10. file associations (windows-only, runs after packages so target apps exist)
+    11. post_commands — runs after everything else, for steps that depend on
+        installed packages (e.g. registering Windows fonts that scoop installed)
     """
     mkdirs(cfg, "all")
     mkdirs(cfg, systype)
@@ -31,6 +33,8 @@ def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
     packages(cfg, systype)
     packages(cfg, "all")
     install_file_associations(cfg)
+    cmds(cfg, "all", section_key="post_commands")
+    cmds(cfg, systype, section_key="post_commands")
 
 
 def boot(cfg: dict, name, systype, loctype, extra_cfg: dict = None):
