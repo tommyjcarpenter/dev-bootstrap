@@ -179,13 +179,15 @@ def _run_check(check_cmd):
         return False
 
 
-def cmds(config, systype):
-    """run all commands"""
-    if "commands" not in config:
-        log.skip("No commands in config")
+def cmds(config, systype, section_key="commands"):
+    """run all commands from config[section_key][systype]. section_key is 'commands'
+    for the pre-package step (default) and 'post_commands' for the post-package step.
+    Same shape on both — list of strings or {cmd, check, label} dicts."""
+    if section_key not in config:
+        log.skip(f"No {section_key} in config")
         return
-    if systype in config["commands"]:
-        for c in config["commands"][systype]:
+    if systype in config[section_key]:
+        for c in config[section_key][systype]:
             if isinstance(c, str):
                 _run_cmd(c)
             else:

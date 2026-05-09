@@ -52,6 +52,7 @@ Note: For Ubuntu, `ppa` entries are automatically processed before `apt` regardl
 
 6. `prereq_packages`: packages that provide language toolchains (rust/cargo, go, poetry) needed before other packages can be installed. These are installed before `packages`. Structure is the same as `packages` but keyed by OS only (no `all` section).
 7. `file_associations` (Windows-only): per-user Windows file extension → app launcher. Each entry has `ext` (`.yaml`), `progid` (`Neovim.YAML`), and `cmd` (`wt -- nvim "%1"`). Writes `HKCU\Software\Classes` so no admin is needed; also clears `UserChoice` so Explorer double-click respects your mapping. Runs after `packages` so the target apps exist.
+8. `post_commands`: same shape as `commands`, but runs *after* packages and `file_associations`. Use this for steps that depend on packages already being installed — e.g. registering a font file that scoop installed but didn't put in the user font registry.
 
 ## Environment-Specific Configs
 
