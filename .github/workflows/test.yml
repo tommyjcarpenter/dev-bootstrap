@@ -3,8 +3,18 @@ name: Test
 on:
   push:
     branches: [main]
+    paths:
+      - 'tests/**'
+      - 'bootstrap/**'
+      - 'poetry.lock'
+      - 'pyproject.toml'
   pull_request:
     branches: [main]
+    paths:
+      - 'tests/**'
+      - 'bootstrap/**'
+      - 'poetry.lock'
+      - 'pyproject.toml'
 
 jobs:
   smoke:
