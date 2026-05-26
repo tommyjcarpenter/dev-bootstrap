@@ -1,8 +1,8 @@
 """Windows-specific helpers: registry PATH refresh, winget install with precheck, and
 per-user file association registration. Kept in a separate module so utils.py stays
 focused on cross-platform plumbing — none of this runs on POSIX (refresh_path is a
-no-op there; the file-assoc / winget entry points are gated on sys.platform by callers
-or by the runner script setting --systype windows).
+no-op there; the file-assoc / winget entry points are gated on sys.platform by callers,
+and systype is auto-detected as "windows" only on win32).
 """
 
 import os
