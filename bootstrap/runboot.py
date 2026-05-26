@@ -28,7 +28,8 @@ def detect_systype():
         except FileNotFoundError:
             pass
     raise RuntimeError(
-        f"Could not auto-detect systype (platform={sys.platform!r}). Please specify --systype explicitly."
+        f"Could not auto-detect systype (platform={sys.platform!r}). "
+        "Only mac, arch, ubuntu, and windows are supported; add support in detect_systype()."
     )
 
 
