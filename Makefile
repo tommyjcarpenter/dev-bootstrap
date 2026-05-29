@@ -1,9 +1,12 @@
 .PHONY: help install-dev test lint schema ci
 
 # Python interpreter inside the project venv. Works on Windows GNU Make
-# (forward slashes are fine) and on Linux/Mac.
+# (forward slashes are fine) and on Linux/Mac. Check $(OS) == Windows_NT
+# explicitly — testing for "non-empty" would mis-route Linux/Darwin shells
+# that happen to export OS=Linux / OS=Darwin to the Windows path.
+ifeq ($(OS),Windows_NT)
 PY := .venv/Scripts/python
-ifeq ($(OS),)
+else
 PY := .venv/bin/python
 endif
 
