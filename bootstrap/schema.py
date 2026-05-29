@@ -73,6 +73,31 @@ schema = {
             },
             "additionalProperties": False,
         },
+        "shell_menu_cleanup": {
+            "description": "Windows right-click menu cleanup state. Three arrays cover the three places shell verbs hide: com_handlers_blocked writes CLSIDs to the HKLM Shell Extensions Blocked list, static_verbs_disabled writes an empty LegacyDisable REG_SZ under a verb key, appx_packages_removed passes a wildcard pattern to Get-AppxPackage | Remove-AppxPackage for MSIX-packaged shell extensions.",
+            "type": "object",
+            "properties": {
+                "windows": {
+                    "type": "object",
+                    "properties": {
+                        "com_handlers_blocked": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/shell_menu_com_handler"},
+                        },
+                        "static_verbs_disabled": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/shell_menu_static_verb"},
+                        },
+                        "appx_packages_removed": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/shell_menu_appx_package"},
+                        },
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "additionalProperties": False,
+        },
     },
     "definitions": {
         "dir": {
@@ -184,6 +209,42 @@ schema = {
                     "description": "Icon for files of this type in Explorer. Format: '<path>,<index>' to pull a PE resource (e.g. 'C:\\\\Program Files\\\\Neovim\\\\bin\\\\nvim.exe,0'), or a path to a .ico file.",
                 },
                 "label": {"type": "string", "description": "Human-readable label for logs"},
+            },
+            "additionalProperties": False,
+        },
+        "shell_menu_com_handler": {
+            "type": "object",
+            "required": ["clsid"],
+            "properties": {
+                "clsid": {
+                    "type": "string",
+                    "description": "CLSID like '{3D1975AF-48C6-4f8e-A182-BE0E08FA86A9}'. Written as a value name (empty REG_SZ) under HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Blocked.",
+                },
+                "name": {"type": "string", "description": "Human-readable label for logs"},
+            },
+            "additionalProperties": False,
+        },
+        "shell_menu_static_verb": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Registry path to the verb key, e.g. 'HKLM:\\\\Software\\\\Classes\\\\Directory\\\\shell\\\\AnyCode'. An empty LegacyDisable REG_SZ is written under the key, hiding the verb from the menu without deleting it. Treated as already-done if the key doesn't exist on the current machine.",
+                },
+                "name": {"type": "string", "description": "Human-readable label for logs"},
+            },
+            "additionalProperties": False,
+        },
+        "shell_menu_appx_package": {
+            "type": "object",
+            "required": ["name_pattern"],
+            "properties": {
+                "name_pattern": {
+                    "type": "string",
+                    "description": "Wildcard package name pattern for Get-AppxPackage, e.g. '*Mp3tag.ShellExtension*'. Matching packages are uninstalled with Remove-AppxPackage.",
+                },
+                "name": {"type": "string", "description": "Human-readable label for logs"},
             },
             "additionalProperties": False,
         },
