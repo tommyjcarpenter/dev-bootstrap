@@ -216,7 +216,10 @@ schema = {
             "type": "object",
             "required": ["clsid"],
             "properties": {
-                "clsid": {"type": "string", "description": "CLSID like '{3D1975AF-48C6-4f8e-A182-BE0E08FA86A9}'. Written as a value name (empty REG_SZ) under HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Blocked."},
+                "clsid": {
+                    "type": "string",
+                    "description": "CLSID like '{3D1975AF-48C6-4f8e-A182-BE0E08FA86A9}'. Written as a value name (empty REG_SZ) under HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Blocked.",
+                },
                 "name": {"type": "string", "description": "Human-readable label for logs"},
             },
             "additionalProperties": False,
@@ -225,7 +228,10 @@ schema = {
             "type": "object",
             "required": ["path"],
             "properties": {
-                "path": {"type": "string", "description": "Registry path to the verb key, e.g. 'HKLM:\\\\Software\\\\Classes\\\\Directory\\\\shell\\\\AnyCode'. An empty LegacyDisable REG_SZ is written under the key, hiding the verb from the menu without deleting it. Treated as already-done if the key doesn't exist on the current machine."},
+                "path": {
+                    "type": "string",
+                    "description": "Registry path to the verb key, e.g. 'HKLM:\\\\Software\\\\Classes\\\\Directory\\\\shell\\\\AnyCode'. An empty LegacyDisable REG_SZ is written under the key, hiding the verb from the menu without deleting it. Treated as already-done if the key doesn't exist on the current machine.",
+                },
                 "name": {"type": "string", "description": "Human-readable label for logs"},
             },
             "additionalProperties": False,
@@ -234,7 +240,10 @@ schema = {
             "type": "object",
             "required": ["name_pattern"],
             "properties": {
-                "name_pattern": {"type": "string", "description": "Wildcard package name pattern for Get-AppxPackage, e.g. '*Mp3tag.ShellExtension*'. Matching packages are uninstalled with Remove-AppxPackage."},
+                "name_pattern": {
+                    "type": "string",
+                    "description": "Wildcard package name pattern for Get-AppxPackage, e.g. '*Mp3tag.ShellExtension*'. Matching packages are uninstalled with Remove-AppxPackage.",
+                },
                 "name": {"type": "string", "description": "Human-readable label for logs"},
             },
             "additionalProperties": False,
