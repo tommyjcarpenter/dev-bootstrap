@@ -10,6 +10,12 @@ python = "^3.10"
 click = "^8.1.3"
 jsonschema = "^4.14.0"
 
+# Mark the dev group optional so plain `poetry install` (runtime use of the
+# `runboot` script) does not pull ruff. Contributors get it via the
+# Makefile's `install-dev` target, which passes `--with dev`.
+[tool.poetry.group.dev]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 # Pinned to the same version CI installs (.github/workflows/lint.yml). Bump
 # in lockstep with the workflow so `make lint` and CI agree on formatting.
