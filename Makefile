@@ -18,6 +18,10 @@ help:
 
 # `poetry install` alone leaves out the dev group, so `make lint` would fail
 # on a fresh clone. `--with dev` pulls in ruff at the CI-pinned version.
+# The committed poetry.toml pins virtualenvs.in-project = true so Poetry
+# creates the venv at .venv/ inside the project, which is where the $(PY)
+# above looks for it; without that, Poetry would cache the venv elsewhere
+# and the subsequent test/lint/schema targets would not find Python.
 install-dev:
 	poetry install --with dev
 
