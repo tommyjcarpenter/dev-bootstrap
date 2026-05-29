@@ -74,7 +74,7 @@ schema = {
             "additionalProperties": False,
         },
         "shell_menu_cleanup": {
-            "description": "Windows right-click menu cleanup state, consumed by bootstrap_scripts/cleanup-shell-menu.ps1. Three arrays cover the three places shell verbs hide: com_handlers_blocked writes CLSIDs to the HKLM Shell Extensions Blocked list, static_verbs_disabled writes an empty LegacyDisable REG_SZ under a verb key, appx_packages_removed passes a wildcard pattern to Get-AppxPackage | Remove-AppxPackage for MSIX-packaged shell extensions.",
+            "description": "Windows right-click menu cleanup state. Three arrays cover the three places shell verbs hide: com_handlers_blocked writes CLSIDs to the HKLM Shell Extensions Blocked list, static_verbs_disabled writes an empty LegacyDisable REG_SZ under a verb key, appx_packages_removed passes a wildcard pattern to Get-AppxPackage | Remove-AppxPackage for MSIX-packaged shell extensions.",
             "type": "object",
             "properties": {
                 "windows": {
