@@ -3,7 +3,7 @@ name = "bootstrap"
 version = "1.3.1"
 description = "Automatic setup of new machines"
 authors = [{ name = "Tommy Carpenter", email = "tommyjcarpenter@gmail.com" }]
-license = "MIT"
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
     "click>=8.1.3",
