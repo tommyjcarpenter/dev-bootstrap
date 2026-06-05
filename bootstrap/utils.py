@@ -267,7 +267,7 @@ def _install_packages(inner, label):
 
 
 def prereq_packages(config, systype):
-    """install prerequisite packages (rust/cargo, go, poetry) for a given systype"""
+    """install prerequisite packages (rust/cargo, go, uv) for a given systype"""
     if "prereq_packages" not in config or systype not in config["prereq_packages"]:
         log.skip(f"No prereq_packages defined for systype {systype}")
         return

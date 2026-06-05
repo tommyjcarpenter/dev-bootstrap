@@ -6,14 +6,14 @@ on:
     paths:
       - 'tests/**'
       - 'bootstrap/**'
-      - 'poetry.lock'
+      - 'uv.lock'
       - 'pyproject.toml'
   pull_request:
     branches: [main]
     paths:
       - 'tests/**'
       - 'bootstrap/**'
-      - 'poetry.lock'
+      - 'uv.lock'
       - 'pyproject.toml'
 
 jobs:
@@ -27,13 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           python-version: "3.13"
-          cache: pip
 
-      - name: Install runtime deps
-        run: pip install click 'jsonschema>=4.14.0'
+      - name: Install deps
+        run: uv sync
 
       - name: Run smoke tests
-        run: python -m unittest discover -v tests
+        run: uv run python -m unittest discover -v tests

@@ -9,7 +9,7 @@ There are probably many. However, the well known ones; Puppet, Chef, Ansible, et
 There are a lot of "dotfiles" repos on github; this depends on that --- it requires you to have a `~/dotfiles/` repo that can be symlinked against, but it goes a lot further (than dotfiles).
 
 # Prerequisites
-1. python3 (3.10+ required; I am using 3.11) and `poetry`
+1. python3 (3.10+ required; I am using 3.11) and `uv`
 2. if on mac, `homebrew`; if on Arch, `yay`; if on Windows, `winget` (ships with Windows 11) and/or `scoop`
 3. If on mac, XCode command line tools (can't even build `gcc` from `homebrew` without this): `sudo xcode-select --install`
 4. If on Windows, enable Developer Mode (Settings → System → For developers → Developer Mode). This lets `os.symlink` work without admin.
@@ -46,7 +46,7 @@ Supported package managers:
 
 Note: For Ubuntu, `ppa` entries are automatically processed before `apt` regardless of order in the config. Similarly on Windows, `scoop_bucket` is processed before `scoop` so buckets are available when packages install.
 
-6. `prereq_packages`: packages that provide language toolchains (rust/cargo, go, poetry) needed before other packages can be installed. These are installed before `packages`. Structure is the same as `packages` but keyed by OS only (no `all` section).
+6. `prereq_packages`: packages that provide language toolchains (rust/cargo, go, uv) needed before other packages can be installed. These are installed before `packages`. Structure is the same as `packages` but keyed by OS only (no `all` section).
 7. `file_associations` (Windows-only): per-user Windows file extension → app launcher. Each entry has required `ext` (`.yaml`), `progid` (`Neovim.YAML`), and `cmd` (`wt -- nvim "%1"`), plus optional `name` (friendly app name shown in the "Open with" picker), `icon` (Explorer icon — a `.ico` path or `<path>,<index>` to pull a PE resource), and `label` (human-readable name for logs). Writes `HKCU\Software\Classes` so no admin is needed; it also clears `UserChoice` (only when it points at a different app) so Explorer double-click respects your mapping. Runs after `packages` so the target apps exist.
 8. `post_commands`: same shape as `commands`, but runs *after* packages and `file_associations`. Use this for steps that depend on packages already being installed — e.g. registering a font file that scoop installed but didn't put in the user font registry.
 
@@ -61,9 +61,9 @@ The extra config files are optional and use the same schema. They're processed a
 
 # Install and Running
 
-    poetry install
-    poetry run runboot --loctype work     # work machines
-    poetry run runboot --loctype private  # personal machines
+    uv sync
+    uv run runboot --loctype work     # work machines
+    uv run runboot --loctype private  # personal machines
 
 The systype (mac, arch, ubuntu, windows) is detected from `sys.platform` and `/etc/os-release`. The script is idempotent — safe to run repeatedly. Add packages to `bootstrap_config.json` and re-run.
 
