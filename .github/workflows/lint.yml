@@ -13,16 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           python-version: "3.13"
-          cache: pip
 
-      - name: Install ruff
-        run: pip install ruff==0.15.12
+      - name: Install deps
+        run: uv sync
 
       - name: Run ruff check
-        run: ruff check bootstrap/
+        run: uv run ruff check bootstrap/
 
       - name: Run ruff format (check only)
-        run: ruff format --check bootstrap/
+        run: uv run ruff format --check bootstrap/

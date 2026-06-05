@@ -1,15 +1,5 @@
 .PHONY: help install-dev test lint schema ci
 
-# Python interpreter inside the project venv. Works on Windows GNU Make
-# (forward slashes are fine) and on Linux/Mac. Check $(OS) == Windows_NT
-# explicitly — testing for "non-empty" would mis-route Linux/Darwin shells
-# that happen to export OS=Linux / OS=Darwin to the Windows path.
-ifeq ($(OS),Windows_NT)
-PY := .venv/Scripts/python
-else
-PY := .venv/bin/python
-endif
-
 # ---- Default: show targets ----
 help:
 	@echo "Common targets:"
@@ -17,20 +7,18 @@ help:
 	@echo "  make lint         Run the same ruff checks CI runs (.github/workflows/lint.yml)"
 	@echo "  make schema       Validate sample_config.json (.github/workflows/schema.yml)"
 	@echo "  make ci           Full pre-push verification: lint + test + schema"
-	@echo "  make install-dev  Install runtime + dev deps (adds ruff) via Poetry"
+	@echo "  make install-dev  Sync runtime + dev deps (adds ruff) via uv"
 
-# `poetry install` alone leaves out the dev group, so `make lint` would fail
-# on a fresh clone. `--with dev` pulls in ruff at the CI-pinned version.
-# The committed poetry.toml pins virtualenvs.in-project = true so Poetry
-# creates the venv at .venv/ inside the project, which is where the $(PY)
-# above looks for it; without that, Poetry would cache the venv elsewhere
-# and the subsequent test/lint/schema targets would not find Python.
+# `uv sync` creates the in-project .venv and installs runtime deps plus the
+# `dev` dependency group (ruff at the CI-pinned version). The targets below use
+# `uv run`, which syncs on demand, so this is only needed to pre-warm the venv.
 install-dev:
-	poetry install --with dev
+	uv sync
 
 # =============================================================================
 # CI-equivalent targets. These mirror .github/workflows/*.yml exactly so a
-# clean run locally means the GitHub run will also pass.
+# clean run locally means the GitHub run will also pass. `uv run` resolves the
+# project venv on every platform, so no OS-specific interpreter path is needed.
 # =============================================================================
 
 # Mirrors .github/workflows/test.yml — discovers and runs every unittest
@@ -38,18 +26,18 @@ install-dev:
 # inner functions shell out to OS-specific tools), so the same command
 # passes on the Linux/macOS/Windows runners CI matrixes over.
 test:
-	$(PY) -m unittest discover -v tests
+	uv run python -m unittest discover -v tests
 
 # Mirrors .github/workflows/lint.yml — ruff check + ruff format --check.
 lint:
-	$(PY) -m ruff check bootstrap/
-	$(PY) -m ruff format --check bootstrap/
+	uv run ruff check bootstrap/
+	uv run ruff format --check bootstrap/
 
 # Mirrors .github/workflows/schema.yml — loads sample_config.json and runs
 # it through bootstrap.schema.config_validate. Catches regressions where a
 # schema change makes the documented sample config invalid.
 schema:
-	$(PY) -c "import json; from bootstrap.schema import config_validate; config_validate(json.load(open('sample_config.json'))); print('sample_config.json is valid')"
+	uv run python -c "import json; from bootstrap.schema import config_validate; config_validate(json.load(open('sample_config.json'))); print('sample_config.json is valid')"
 
 # Full pre-push verification: everything CI runs, in one shot.
 ci: lint test schema

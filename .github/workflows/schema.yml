@@ -13,17 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           python-version: "3.13"
-          cache: pip
 
-      - name: Install jsonschema
-        run: pip install 'jsonschema>=4.14.0'
+      - name: Install deps
+        run: uv sync
 
       - name: Validate sample_config.json against bootstrap/schema.py
         run: |
-          python - <<'PY'
+          uv run python - <<'PY'
           import json
           from bootstrap.schema import config_validate
           with open("sample_config.json") as f:

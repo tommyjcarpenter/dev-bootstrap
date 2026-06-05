@@ -13,7 +13,7 @@ def boot_config(cfg: dict, systype, loctype, run_prereqs=False):
      4. os-specific softlinks (links.mac/arch/ubuntu/windows)
      5. generic commands
      6. system specific commands
-     7. prereq packages (rust/cargo, go, poetry) - only on first config
+     7. prereq packages (rust/cargo, go, uv) - only on first config
      8. system specific packages (installs npm, go, etc via pacman/brew/apt/winget)
      9. generic packages (uses pip, npm, go_install, cargo, fisher)
     10. file associations (windows-only, runs after packages so target apps exist)

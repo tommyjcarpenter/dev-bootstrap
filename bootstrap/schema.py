@@ -52,7 +52,7 @@ schema = {
             "additionalProperties": False,
         },
         "prereq_packages": {
-            "description": "packages that provide language toolchains (rust/cargo, go, poetry) needed before other packages can be installed. These are installed before `packages`.",
+            "description": "packages that provide language toolchains (rust/cargo, go, uv) needed before other packages can be installed. These are installed before `packages`.",
             "type": "object",
             "properties": {
                 "mac": {"$ref": "#/definitions/package_section"},
