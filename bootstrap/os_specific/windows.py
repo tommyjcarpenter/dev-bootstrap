@@ -146,8 +146,30 @@ def set_file_assoc(ext, progid, cmd, name=None, icon=None, label=None):
             pass
 
 
+def _notify_assoc_changed():
+    """Broadcast SHCNE_ASSOCCHANGED so Explorer drops its cached file-type defaults.
+
+    Writing HKCU\\Software\\Classes alone isn't enough: Explorer caches the resolved
+    default per extension, so a freshly written association doesn't take effect until the
+    next sign-in or an Explorer restart. For an extension Explorer already resolved to a
+    different app (e.g. .json -> Visual Studio) the stale default keeps winning until the
+    cache is invalidated — which is why a newly registered type appears in "Open with" yet
+    double-click still opens the old app. SHChangeNotify is the documented, admin-free way
+    to invalidate that cache; it lives in shell32 and returns nothing.
+    """
+    import ctypes
+
+    SHCNE_ASSOCCHANGED = 0x08000000
+    SHCNF_IDLIST = 0x0000
+    ctypes.windll.shell32.SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, None, None)
+
+
 def install_file_associations(config):
-    """Top-level entry: reads config['file_associations']['windows'] and registers each."""
+    """Top-level entry: reads config['file_associations']['windows'] and registers each.
+
+    After registering every entry, broadcasts a single SHCNE_ASSOCCHANGED so Explorer
+    picks up the new defaults immediately instead of on the next sign-in.
+    """
     if "file_associations" not in config:
         log.skip("No file_associations in config")
         return
@@ -168,3 +190,5 @@ def install_file_associations(config):
             icon=assoc.get("icon"),
             label=assoc.get("label"),
         )
+    log.action("refreshing Explorer association cache (SHCNE_ASSOCCHANGED)")
+    _notify_assoc_changed()
