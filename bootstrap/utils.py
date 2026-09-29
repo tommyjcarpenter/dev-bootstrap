@@ -1,5 +1,6 @@
 """install everything"""
 
+import json
 import os
 import shutil
 import subprocess
@@ -39,6 +40,9 @@ PACKAGE_ORDER = {
 }
 # OS-specific package types first, then cross-platform (ensures npm/go are installed before used)
 ALL_KNOWN_PACKAGE_TYPES = OS_SPECIFIC_PACKAGE_ORDER + CROSS_PLATFORM_PACKAGE_ORDER
+
+NPM_LIST_GLOBALS_CMD = "npm ls -g --depth=0 --json"
+NPM_LIST_TIMEOUT_SECONDS = 60
 
 
 def _replace_home(path):
@@ -179,6 +183,46 @@ def _run_check(check_cmd):
         return False
 
 
+def _installed_npm_globals() -> set[str]:
+    """Names of globally installed npm packages. Empty when npm is missing or prints no JSON."""
+    # `npm ls` exits 1 on extraneous or invalid deps but still prints the full tree, so the exit code is ignored
+    result = subprocess.run(
+        NPM_LIST_GLOBALS_CMD,
+        shell=True,
+        executable=SHELLPATH,
+        capture_output=True,
+        text=True,
+        timeout=NPM_LIST_TIMEOUT_SECONDS,
+    )
+    try:
+        return set(json.loads(result.stdout).get("dependencies", {}))
+    except json.JSONDecodeError:
+        return set()
+
+
+def _install_npm_packages(pkgs: list[str]) -> None:
+    """Globally install only the npm packages that are not installed yet.
+
+    `npm install -g` retires and re-extracts every named package even when it is already current. On Windows that
+    rename fails with EBUSY while any process holds a file in the package dir open (e.g. an editor's running
+    pyright language server), so a plain rerun of the bootstrap aborts. Skipping installed packages keeps reruns
+    idempotent.
+    A spec with a version suffix (`pkg@1.2`) never matches an installed name, so it always installs.
+    """
+    installed = _installed_npm_globals()
+    missing = []
+    for pkg in pkgs:
+        if pkg in installed:
+            log.skip(f"npm: {pkg} already installed")
+            continue
+        missing.append(pkg)
+    if not missing:
+        return
+    # Windows npm has no sudo and doesn't need it; POSIX requires sudo for -g installs
+    prefix = "" if sys.platform == "win32" else "sudo "
+    _run_cmd(f"{prefix}npm install {' '.join(missing)} -g")
+
+
 def cmds(config, systype, section_key="commands"):
     """run all commands from config[section_key][systype]. section_key is 'commands'
     for the pre-package step (default) and 'post_commands' for the post-package step.
@@ -244,9 +288,7 @@ def _install_packages(inner, label):
             case "fisher":
                 _run_cmd("fisher install " + " ".join(inner["fisher"]))
             case "npm":
-                # Windows npm has no sudo and doesn't need it; POSIX requires sudo for -g installs
-                prefix = "" if sys.platform == "win32" else "sudo "
-                _run_cmd("{0}npm install {1} -g".format(prefix, " ".join(inner["npm"])))
+                _install_npm_packages(inner["npm"])
             case "pip":
                 # Windows: winget Python is a per-user install at %LOCALAPPDATA%\Programs\Python\PythonXX\
                 # whose Scripts dir is already on PATH; plain `pip install` writes there. We deliberately

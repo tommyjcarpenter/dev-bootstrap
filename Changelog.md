@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-09-29
+- `npm` package type installs only the globals that are not installed yet (`npm ls -g --depth=0 --json` precheck), so a bootstrap rerun is idempotent. `npm install -g` re-extracts packages that are already installed, and on Windows that fails with EBUSY while a running process, such as an editor's language server, holds files in the package dir.
+
 ## [1.3.1] - 2026-06-05
 - switch project tooling from Poetry to `uv`: PEP 621 `pyproject.toml`, `uv.lock`, hatchling build backend, `Makefile` and CI workflows driven by `uv sync`/`uv run`
 
