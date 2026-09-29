@@ -206,7 +206,7 @@ def _install_npm_packages(pkgs: list[str]) -> None:
     `npm install -g` retires and re-extracts every named package even when it is already current. On Windows that
     rename fails with EBUSY while any process holds a file in the package dir open (e.g. an editor's running
     pyright language server), so a plain rerun of the bootstrap aborts. Skipping installed packages keeps reruns
-    idempotent. The tradeoff is that reruns no longer upgrade npm globals; use `npm update -g` for that.
+    idempotent.
     A spec with a version suffix (`pkg@1.2`) never matches an installed name, so it always installs.
     """
     installed = _installed_npm_globals()
